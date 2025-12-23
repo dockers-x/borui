@@ -127,6 +127,35 @@ class API {
     async getStats() {
         return this.request('/system/stats');
     }
+
+    // Auth & User
+    async getCurrentUser() {
+        return this.request('/auth/me');
+    }
+
+    async updateUsername(newUsername) {
+        return this.request('/auth/update-username', {
+            method: 'PUT',
+            body: JSON.stringify({ new_username: newUsername }),
+        });
+    }
+
+    async updateDisplayName(displayName) {
+        return this.request('/auth/update-display-name', {
+            method: 'PUT',
+            body: JSON.stringify({ display_name: displayName }),
+        });
+    }
+
+    async updatePassword(currentPassword, newPassword) {
+        return this.request('/auth/update-password', {
+            method: 'PUT',
+            body: JSON.stringify({
+                current_password: currentPassword,
+                new_password: newPassword,
+            }),
+        });
+    }
 }
 
 // Global API instance

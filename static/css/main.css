@@ -685,3 +685,98 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: var(--primary);
 }
+
+/* Settings Page Styles */
+.settings-panel {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.settings-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+}
+
+.settings-section h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 var(--space-md) 0;
+}
+
+.settings-card {
+    background: var(--bg-card);
+    padding: var(--space-lg);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow var(--transition-base);
+}
+
+.settings-card:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.settings-card h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 var(--space-md) 0;
+}
+
+.settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.settings-form .form-group {
+    margin-bottom: 0;
+}
+
+.settings-form button[type="submit"] {
+    align-self: flex-start;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.user-info p {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    color: var(--text-secondary);
+    font-size: 0.9375rem;
+}
+
+.user-info strong {
+    color: var(--text-primary);
+    font-weight: 600;
+    margin-right: var(--space-sm);
+    min-width: 120px;
+}
+
+.user-info span {
+    color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+    .settings-card {
+        padding: var(--space-md);
+    }
+
+    .settings-section h2 {
+        font-size: 1.25rem;
+    }
+
+    .settings-card h3 {
+        font-size: 1rem;
+    }
+
+    .user-info strong {
+        min-width: 100px;
+    }
+}

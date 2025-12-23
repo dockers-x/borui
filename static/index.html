@@ -13,6 +13,7 @@
             <a href="#servers" class="nav-link active" data-i18n="nav.servers">Servers</a>
             <a href="#clients" class="nav-link" data-i18n="nav.clients">Clients</a>
             <a href="#system" class="nav-link" data-i18n="nav.system">System</a>
+            <a href="#settings" class="nav-link" data-i18n="nav.settings">Settings</a>
         </div>
         <div class="nav-actions">
             <select id="language-selector" class="lang-select">
@@ -51,6 +52,70 @@
             </div>
             <div id="system-info" class="info-panel">
                 <p class="loading" data-i18n="common.loading">Loading...</p>
+            </div>
+        </div>
+
+        <div id="settings-view" class="view">
+            <div class="view-header">
+                <h1 data-i18n="settings.title">User Settings</h1>
+            </div>
+            <div class="settings-panel">
+                <div class="settings-section">
+                    <h2 data-i18n="settings.account">Account Settings</h2>
+
+                    <div class="settings-card">
+                        <h3 data-i18n="settings.changeDisplayName">Change Display Name</h3>
+                        <form id="display-name-form" class="settings-form">
+                            <div class="form-group">
+                                <label for="new-display-name" data-i18n="settings.newDisplayName">New Display Name</label>
+                                <input type="text" id="new-display-name" maxlength="50">
+                                <small class="form-help" data-i18n="settings.displayNameHelp">Leave empty to use username (max 50 characters)</small>
+                            </div>
+                            <button type="submit" class="btn-primary" data-i18n="settings.updateDisplayName">Update Display Name</button>
+                        </form>
+                    </div>
+
+                    <div class="settings-card">
+                        <h3 data-i18n="settings.changeUsername">Change Username</h3>
+                        <form id="username-form" class="settings-form">
+                            <div class="form-group">
+                                <label for="new-username" data-i18n="settings.newUsername">New Username</label>
+                                <input type="text" id="new-username" required minlength="3">
+                                <small class="form-help" data-i18n="settings.usernameHelp">At least 3 characters, used for login</small>
+                            </div>
+                            <button type="submit" class="btn-primary" data-i18n="settings.updateUsername">Update Username</button>
+                        </form>
+                    </div>
+
+                    <div class="settings-card">
+                        <h3 data-i18n="settings.changePassword">Change Password</h3>
+                        <form id="password-form" class="settings-form">
+                            <div class="form-group">
+                                <label for="current-password" data-i18n="settings.currentPassword">Current Password</label>
+                                <input type="password" id="current-password" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="new-password" data-i18n="settings.newPassword">New Password</label>
+                                <input type="password" id="new-password" required minlength="6">
+                                <small class="form-help" data-i18n="settings.passwordHelp">At least 6 characters</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="confirm-password" data-i18n="settings.confirmPassword">Confirm New Password</label>
+                                <input type="password" id="confirm-password" required minlength="6">
+                            </div>
+                            <button type="submit" class="btn-primary" data-i18n="settings.updatePassword">Update Password</button>
+                        </form>
+                    </div>
+
+                    <div class="settings-card">
+                        <h3 data-i18n="settings.currentUser">Current User</h3>
+                        <div class="user-info">
+                            <p><strong data-i18n="settings.displayName">Display Name:</strong> <span id="current-display-name">-</span></p>
+                            <p><strong data-i18n="settings.username">Username:</strong> <span id="current-username">-</span></p>
+                            <p><strong data-i18n="settings.userId">User ID:</strong> <span id="current-user-id">-</span></p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
@@ -178,6 +243,7 @@
     <script src="/js/websocket.js"></script>
     <script src="/js/servers.js"></script>
     <script src="/js/clients.js"></script>
+    <script src="/js/settings.js"></script>
     <script src="/js/app.js"></script>
 </body>
 </html>

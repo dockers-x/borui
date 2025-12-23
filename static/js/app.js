@@ -42,6 +42,8 @@
                 clientsUI.loadClients();
             } else if (viewName === 'system') {
                 loadSystemInfo();
+            } else if (viewName === 'settings') {
+                loadSettings();
             }
         }
     }

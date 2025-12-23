@@ -2,7 +2,8 @@
     "nav": {
         "servers": "服务器",
         "clients": "客户端",
-        "system": "系统"
+        "system": "系统",
+        "settings": "设置"
     },
     "login": {
         "title": "Borui",
@@ -63,6 +64,28 @@
         "totalClients": "客户端总数",
         "serversRunning": "运行中的服务器",
         "clientsConnected": "已连接的客户端"
+    },
+    "settings": {
+        "title": "用户设置",
+        "account": "账户设置",
+        "changeDisplayName": "修改昵称",
+        "changeUsername": "修改用户名",
+        "changePassword": "修改密码",
+        "currentUser": "当前用户",
+        "displayName": "昵称",
+        "username": "用户名",
+        "userId": "用户ID",
+        "newDisplayName": "新昵称",
+        "newUsername": "新用户名",
+        "currentPassword": "当前密码",
+        "newPassword": "新密码",
+        "confirmPassword": "确认新密码",
+        "displayNameHelp": "留空则使用用户名（最多50个字符）",
+        "usernameHelp": "至少3个字符，用于登录",
+        "passwordHelp": "至少6个字符",
+        "updateDisplayName": "更新昵称",
+        "updateUsername": "更新用户名",
+        "updatePassword": "更新密码"
     },
     "common": {
         "loading": "加载中...",

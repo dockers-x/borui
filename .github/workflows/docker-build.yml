@@ -2,10 +2,13 @@ name: Build and Push Docker Images
 
 on:
   push:
-    branches: [ main, master ]
-    tags: [ 'v*' ]
-  pull_request:
-    branches: [ main, master ]
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
 
 env:
   REGISTRY_DOCKERHUB: docker.io

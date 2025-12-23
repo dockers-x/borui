@@ -1,0 +1,151 @@
+name: Release Binary
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+  BINARY_NAME: borui
+  # Use offline mode for sqlx to avoid database connection during build
+  SQLX_OFFLINE: true
+
+jobs:
+  release:
+    name: Cross build for ${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            exe: borui
+            cross: false
+
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux-musl
+            exe: borui
+            cross: true
+
+          - os: ubuntu-latest
+            target: arm-unknown-linux-musleabi
+            exe: borui
+            cross: true
+
+          - os: ubuntu-latest
+            target: arm-unknown-linux-musleabihf
+            exe: borui
+            cross: true
+
+          - os: ubuntu-latest
+            target: armv7-unknown-linux-musleabihf
+            exe: borui
+            cross: true
+
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            exe: borui.exe
+            cross: false
+
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            exe: borui
+            cross: false
+
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            exe: borui
+            cross: false
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          targets: ${{ matrix.target }}
+
+      - name: Install OpenSSL (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
+        run: sudo apt-get update && sudo apt-get install -y pkg-config libssl-dev
+
+      - name: Install OpenSSL (macOS)
+        if: matrix.os == 'macos-latest'
+        run: brew install openssl@3
+
+      # Generate sqlx offline data for compile-time verification
+      - name: Setup sqlx-cli
+        if: matrix.cross == false
+        run: cargo install sqlx-cli --no-default-features --features sqlite
+
+      - name: Prepare sqlx offline mode
+        if: matrix.cross == false
+        run: |
+          cargo sqlx prepare --workspace || echo "sqlx-data.json not generated, continuing anyway"
+
+      # Native build
+      - name: Run tests
+        if: matrix.cross == false
+        run: cargo test --release --target ${{ matrix.target }} --verbose
+
+      - name: Build release
+        if: matrix.cross == false
+        run: cargo build --release --target ${{ matrix.target }}
+
+      # Cross build
+      - name: Install cross
+        if: matrix.cross
+        run: cargo install cross --git https://github.com/cross-rs/cross
+
+      - name: Run tests
+        if: matrix.cross
+        run: cross test --release --target ${{ matrix.target }} --verbose
+
+      - name: Build release
+        if: matrix.cross
+        run: cross build --release --target ${{ matrix.target }}
+
+      - name: Run UPX
+        # Upx may not support some platforms. Ignore the errors
+        continue-on-error: true
+        # Disable upx for mips and macOS
+        if: matrix.os == 'ubuntu-latest' && !contains(matrix.target, 'mips')
+        uses: crazy-max/ghaction-upx@v3
+        with:
+          version: v4.2.2
+          files: target/${{ matrix.target }}/release/${{ matrix.exe }}
+          args: -q --best --lzma
+
+      # Prepare release package with migrations
+      - name: Prepare release package
+        shell: bash
+        run: |
+          cd target/${{ matrix.target }}/release
+          mkdir -p migrations
+          cp -r ${{ github.workspace }}/migrations/* migrations/
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: borui-${{ matrix.target }}
+          path: |
+            target/${{ matrix.target }}/release/${{ matrix.exe }}
+            target/${{ matrix.target }}/release/migrations/
+
+      - name: Zip Release
+        uses: TheDoctor0/zip-release@0.7.6
+        with:
+          type: zip
+          filename: borui-${{ matrix.target }}.zip
+          directory: target/${{ matrix.target }}/release/
+          path: |
+            ${{ matrix.exe }}
+            migrations
+
+      - name: Publish
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: target/${{ matrix.target }}/release/borui-${{ matrix.target }}.zip
+          generate_release_notes: true
+          draft: true
+          token: ${{ secrets.GITHUB_TOKEN }}

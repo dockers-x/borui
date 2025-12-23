@@ -6,4 +6,4 @@ pub mod user;
 pub use server::{Server, CreateServer, UpdateServer, ServerStatus};
 pub use client::{Client, CreateClient, UpdateClient, ClientStatus};
 pub use session::{Session, SessionType, SessionStats};
-pub use user::{User, CreateUser, LoginRequest, LoginResponse, UserInfo};
+pub use user::{User, CreateUser, LoginRequest, LoginResponse, UserInfo, UpdateUsernameRequest, UpdateDisplayNameRequest, UpdatePasswordRequest};

@@ -2,7 +2,6 @@ use axum::{
     routing::get,
     Router,
 };
-use futures_util::StreamExt;
 use sqlx::sqlite::SqlitePoolOptions;
 use std::net::SocketAddr;
 use std::str::FromStr;
@@ -11,7 +10,7 @@ use tower_http::cors::CorsLayer;
 use tower_http::trace::TraceLayer;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
-use borui::{api, config::Config, state::AppState, web, ws};
+use borui::{api, config::Config, db, models, state::AppState, web, ws};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -103,8 +102,8 @@ async fn main() -> anyhow::Result<()> {
     // Create application state
     let state = AppState::new(db);
 
-    // TODO: Start auto-start servers and clients
-    // start_auto_start_entities(&state).await?;
+    // Start auto-start servers and clients
+    start_auto_start_entities(&state).await?;
 
     // Build router
     let app = Router::new()
@@ -166,3 +165,79 @@ async fn shutdown_signal() {
     }
 }
 
+// Start all servers and clients marked with auto_start
+async fn start_auto_start_entities(state: &AppState) -> anyhow::Result<()> {
+    tracing::info!("Starting auto-start entities...");
+
+    // Get all servers
+    let servers = db::list_servers(&state.db).await?;
+    let auto_start_servers: Vec<_> = servers
+        .into_iter()
+        .filter(|s| s.auto_start && s.status != models::ServerStatus::Running)
+        .collect();
+
+    let server_count = auto_start_servers.len();
+
+    if !auto_start_servers.is_empty() {
+        tracing::info!("Found {} servers to auto-start", server_count);
+        for server in auto_start_servers {
+            tracing::info!("Auto-starting server: {} (id: {})", server.name, server.id);
+
+            // Update status to starting
+            db::update_server_status(&state.db, server.id, models::ServerStatus::Starting, None).await?;
+            db::update_server_last_started(&state.db, server.id).await?;
+
+            // Start the server
+            match state.server_manager.start_server(server.clone()).await {
+                Ok(_) => {
+                    db::update_server_status(&state.db, server.id, models::ServerStatus::Running, None).await?;
+                    tracing::info!("Successfully started server: {}", server.name);
+                }
+                Err(e) => {
+                    let error_msg = e.to_string();
+                    db::update_server_status(&state.db, server.id, models::ServerStatus::Error, Some(error_msg.clone())).await?;
+                    tracing::error!("Failed to start server {}: {}", server.name, error_msg);
+                }
+            }
+        }
+    }
+
+    // Get all clients
+    let clients = db::list_clients(&state.db).await?;
+    let auto_start_clients: Vec<_> = clients
+        .into_iter()
+        .filter(|c| c.auto_start && c.status != models::ClientStatus::Connected)
+        .collect();
+
+    let client_count = auto_start_clients.len();
+
+    if !auto_start_clients.is_empty() {
+        tracing::info!("Found {} clients to auto-start", client_count);
+        for client in auto_start_clients {
+            tracing::info!("Auto-starting client: {} (id: {})", client.name, client.id);
+
+            // Update status to starting
+            db::update_client_status(&state.db, client.id, models::ClientStatus::Starting, None, None).await?;
+            db::update_client_last_connected(&state.db, client.id).await?;
+
+            // Start the client
+            match state.client_manager.start_client(client.clone()).await {
+                Ok(_) => {
+                    db::update_client_status(&state.db, client.id, models::ClientStatus::Connected, None, None).await?;
+                    tracing::info!("Successfully started client: {}", client.name);
+                }
+                Err(e) => {
+                    let error_msg = e.to_string();
+                    db::update_client_status(&state.db, client.id, models::ClientStatus::Error, None, Some(error_msg.clone())).await?;
+                    tracing::error!("Failed to start client {}: {}", client.name, error_msg);
+                }
+            }
+        }
+    }
+
+    if server_count == 0 && client_count == 0 {
+        tracing::info!("No auto-start entities found");
+    }
+
+    Ok(())
+}

@@ -2,7 +2,8 @@
     "nav": {
         "servers": "Servers",
         "clients": "Clients",
-        "system": "System"
+        "system": "System",
+        "settings": "Settings"
     },
     "login": {
         "title": "Borui",
@@ -63,6 +64,28 @@
         "totalClients": "Total Clients",
         "serversRunning": "Servers Running",
         "clientsConnected": "Clients Connected"
+    },
+    "settings": {
+        "title": "User Settings",
+        "account": "Account Settings",
+        "changeDisplayName": "Change Display Name",
+        "changeUsername": "Change Username",
+        "changePassword": "Change Password",
+        "currentUser": "Current User",
+        "displayName": "Display Name",
+        "username": "Username",
+        "userId": "User ID",
+        "newDisplayName": "New Display Name",
+        "newUsername": "New Username",
+        "currentPassword": "Current Password",
+        "newPassword": "New Password",
+        "confirmPassword": "Confirm New Password",
+        "displayNameHelp": "Leave empty to use username (max 50 characters)",
+        "usernameHelp": "At least 3 characters, used for login",
+        "passwordHelp": "At least 6 characters",
+        "updateDisplayName": "Update Display Name",
+        "updateUsername": "Update Username",
+        "updatePassword": "Update Password"
     },
     "common": {
         "loading": "Loading...",

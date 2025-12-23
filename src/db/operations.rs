@@ -35,6 +35,53 @@ pub async fn get_user_by_id(pool: &SqlitePool, id: i64) -> Result<User> {
     Ok(user)
 }
 
+pub async fn update_username(pool: &SqlitePool, user_id: i64, new_username: &str) -> Result<User> {
+    // Check if username already exists
+    let existing = sqlx::query("SELECT id FROM users WHERE username = ? AND id != ?")
+        .bind(new_username)
+        .bind(user_id)
+        .fetch_optional(pool)
+        .await?;
+
+    if existing.is_some() {
+        return Err(AppError::BadRequest("Username already exists".to_string()));
+    }
+
+    let user = sqlx::query_as::<_, User>(
+        "UPDATE users SET username = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? RETURNING *"
+    )
+    .bind(new_username)
+    .bind(user_id)
+    .fetch_one(pool)
+    .await?;
+
+    Ok(user)
+}
+
+pub async fn update_password(pool: &SqlitePool, user_id: i64, new_password_hash: &str) -> Result<User> {
+    let user = sqlx::query_as::<_, User>(
+        "UPDATE users SET password_hash = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? RETURNING *"
+    )
+    .bind(new_password_hash)
+    .bind(user_id)
+    .fetch_one(pool)
+    .await?;
+
+    Ok(user)
+}
+
+pub async fn update_display_name(pool: &SqlitePool, user_id: i64, display_name: Option<&str>) -> Result<User> {
+    let user = sqlx::query_as::<_, User>(
+        "UPDATE users SET display_name = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? RETURNING *"
+    )
+    .bind(display_name)
+    .bind(user_id)
+    .fetch_one(pool)
+    .await?;
+
+    Ok(user)
+}
+
 // Server operations
 pub async fn list_servers(pool: &SqlitePool) -> Result<Vec<Server>> {
     let servers = sqlx::query_as::<_, Server>("SELECT * FROM servers ORDER BY id DESC")
