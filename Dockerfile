@@ -3,35 +3,23 @@ FROM rust:1.92-slim as builder
 
 WORKDIR /app
 
-# Install dependencies
+# Install build dependencies
 RUN apt-get update && apt-get install -y \
     pkg-config \
     libssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy manifests
-COPY Cargo.toml Cargo.lock ./
-
-# Create dummy source files for dependency caching
-# borui is a library + binary project, so we need both lib.rs and main.rs
-RUN mkdir src && \
-    echo "pub fn dummy() {}" > src/lib.rs && \
-    echo "fn main() {}" > src/main.rs && \
-    cargo build --release && \
-    rm -rf src
-
-# Copy all source code, migrations, and static files
+# Copy all source files
+# (For dependency caching in a complex project, consider using cargo-chef)
 COPY . .
 
-# Build the actual application
-# Remove the dummy build artifacts to force a clean rebuild
-RUN rm -f /app/target/release/borui* && \
-    rm -f /app/target/release/deps/borui* && \
-    cargo build --release
+# Build the application in release mode
+RUN cargo build --release
 
-# Runtime stage
+# Runtime stage - use minimal base image
 FROM debian:bookworm-slim
 
+# Install runtime dependencies
 RUN apt-get update && apt-get install -y \
     ca-certificates \
     libssl3 \
@@ -39,17 +27,23 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-# Copy only the binary (static files and migrations are embedded)
+# Copy the compiled binary from builder stage
+# Static files and migrations are embedded via rust-embed and sqlx::migrate!
 COPY --from=builder /app/target/release/borui /app/borui
 
 # Create data directory for SQLite database
 RUN mkdir -p /app/data
 
-# Expose ports (3000 for web UI, 7835 is default bore port range start)
-EXPOSE 3000 7835
+# Expose ports
+# 3000: Web UI
+# 7835-65535: Default bore tunnel port range
+EXPOSE 3000 7835-65535
 
-ENV DATABASE_URL=sqlite:///app/data/borui.db
-ENV BIND_ADDR=0.0.0.0:3000
-ENV RUST_LOG=info
+# Environment variables
+ENV DATABASE_URL=sqlite:///app/data/borui.db \
+    BIND_ADDR=0.0.0.0:3000 \
+    RUST_LOG=info \
+    JWT_SECRET=change-me-in-production
 
+# Run the application
 CMD ["/app/borui"]
