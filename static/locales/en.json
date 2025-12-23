@@ -1,0 +1,28 @@
+{
+    "nav": {
+        "servers": "Servers",
+        "clients": "Clients",
+        "system": "System"
+    },
+    "servers": {
+        "title": "Bore Servers",
+        "create": "Create Server"
+    },
+    "clients": {
+        "title": "Bore Clients",
+        "create": "Create Client"
+    },
+    "system": {
+        "title": "System Information"
+    },
+    "common": {
+        "loading": "Loading..."
+    },
+    "status": {
+        "connected": "Connected",
+        "disconnected": "Disconnected",
+        "running": "Running",
+        "stopped": "Stopped",
+        "error": "Error"
+    }
+}

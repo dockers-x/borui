@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Borui - Tunnel Management</title>
+    <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">Borui</div>
+        <div class="nav-menu">
+            <a href="#servers" class="nav-link active" data-i18n="nav.servers">Servers</a>
+            <a href="#clients" class="nav-link" data-i18n="nav.clients">Clients</a>
+            <a href="#system" class="nav-link" data-i18n="nav.system">System</a>
+        </div>
+        <div class="nav-actions">
+            <select id="language-selector" class="lang-select">
+                <option value="en">English</option>
+                <option value="zh-CN">简体中文</option>
+                <option value="zh-TW">繁體中文</option>
+            </select>
+            <button id="logout-btn" class="btn-logout" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div id="servers-view" class="view active">
+            <div class="view-header">
+                <h1 data-i18n="servers.title">Bore Servers</h1>
+                <button id="create-server-btn" class="btn-primary" data-i18n="servers.create">Create Server</button>
+            </div>
+            <div id="servers-list" class="items-list">
+                <p class="loading" data-i18n="common.loading">Loading...</p>
+            </div>
+        </div>
+
+        <div id="clients-view" class="view">
+            <div class="view-header">
+                <h1 data-i18n="clients.title">Bore Clients</h1>
+                <button id="create-client-btn" class="btn-primary" data-i18n="clients.create">Create Client</button>
+            </div>
+            <div id="clients-list" class="items-list">
+                <p class="loading" data-i18n="common.loading">Loading...</p>
+            </div>
+        </div>
+
+        <div id="system-view" class="view">
+            <div class="view-header">
+                <h1 data-i18n="system.title">System Information</h1>
+            </div>
+            <div id="system-info" class="info-panel">
+                <p class="loading" data-i18n="common.loading">Loading...</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Server Modal -->
+    <div id="server-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="server-modal-title">Create Server</h2>
+                <span class="close" onclick="closeServerModal()">&times;</span>
+            </div>
+            <form id="server-form">
+                <div class="form-group">
+                    <label for="server-name">Name *</label>
+                    <input type="text" id="server-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="server-description">Description</label>
+                    <input type="text" id="server-description">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="server-bind-addr">Bind Address</label>
+                        <input type="text" id="server-bind-addr" value="0.0.0.0">
+                    </div>
+                    <div class="form-group">
+                        <label for="server-bind-tunnels">Bind Tunnels</label>
+                        <input type="text" id="server-bind-tunnels" value="0.0.0.0">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="server-port-start">Port Range Start</label>
+                        <input type="number" id="server-port-start" value="1024" min="1024" max="65535">
+                    </div>
+                    <div class="form-group">
+                        <label for="server-port-end">Port Range End</label>
+                        <input type="number" id="server-port-end" value="65535" min="1024" max="65535">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="server-secret">Secret (Optional)</label>
+                    <input type="password" id="server-secret">
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="server-auto-start">
+                        Auto-start on application boot
+                    </label>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeServerModal()">Cancel</button>
+                    <button type="submit" class="btn-primary">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Client Modal -->
+    <div id="client-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="client-modal-title">Create Client</h2>
+                <span class="close" onclick="closeClientModal()">&times;</span>
+            </div>
+            <form id="client-form">
+                <div class="form-group">
+                    <label for="client-name">Name *</label>
+                    <input type="text" id="client-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="client-description">Description</label>
+                    <input type="text" id="client-description">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="client-local-host">Local Host</label>
+                        <input type="text" id="client-local-host" value="localhost">
+                    </div>
+                    <div class="form-group">
+                        <label for="client-local-port">Local Port *</label>
+                        <input type="number" id="client-local-port" required min="1" max="65535">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="client-remote-server">Remote Server *</label>
+                        <input type="text" id="client-remote-server" required placeholder="example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="client-remote-port">Remote Port (0=auto)</label>
+                        <input type="number" id="client-remote-port" value="0" min="0" max="65535">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="client-secret">Secret (Optional)</label>
+                    <input type="password" id="client-secret">
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="client-auto-start">
+                        Auto-start on application boot
+                    </label>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeClientModal()">Cancel</button>
+                    <button type="submit" class="btn-primary">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="status-bar" class="status-bar">
+        <span id="connection-status">
+            <span class="status-indicator connected"></span>
+            <span data-i18n="status.connected">Connected</span>
+        </span>
+    </div>
+
+    <script src="/js/i18n.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/websocket.js"></script>
+    <script src="/js/servers.js"></script>
+    <script src="/js/clients.js"></script>
+    <script src="/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  borui:
+    build: .
+    image: borui:latest
+    container_name: borui
+    restart: unless-stopped
+    ports:
+      - "3000:3000"       # Web UI
+      - "7835:7835"       # Bore control port
+      - "10000-10100:10000-10100"  # Tunnel ports range
+    volumes:
+      - ./data:/app/data
+      - ./config:/app/config
+    environment:
+      - DATABASE_URL=sqlite:///app/data/borui.db
+      - BIND_ADDR=0.0.0.0:3000
+      - RUST_LOG=info,borui=debug
+      - JWT_SECRET=${JWT_SECRET:-change-me-in-production}
+    networks:
+      - borui-network
+
+networks:
+  borui-network:
+    driver: bridge

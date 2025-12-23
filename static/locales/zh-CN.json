@@ -1,0 +1,28 @@
+{
+    "nav": {
+        "servers": "服务器",
+        "clients": "客户端",
+        "system": "系统"
+    },
+    "servers": {
+        "title": "Bore 服务器",
+        "create": "创建服务器"
+    },
+    "clients": {
+        "title": "Bore 客户端",
+        "create": "创建客户端"
+    },
+    "system": {
+        "title": "系统信息"
+    },
+    "common": {
+        "loading": "加载中..."
+    },
+    "status": {
+        "connected": "已连接",
+        "disconnected": "未连接",
+        "running": "运行中",
+        "stopped": "已停止",
+        "error": "错误"
+    }
+}

@@ -1,0 +1,28 @@
+{
+    "nav": {
+        "servers": "伺服器",
+        "clients": "客戶端",
+        "system": "系統"
+    },
+    "servers": {
+        "title": "Bore 伺服器",
+        "create": "建立伺服器"
+    },
+    "clients": {
+        "title": "Bore 客戶端",
+        "create": "建立客戶端"
+    },
+    "system": {
+        "title": "系統資訊"
+    },
+    "common": {
+        "loading": "載入中..."
+    },
+    "status": {
+        "connected": "已連接",
+        "disconnected": "未連接",
+        "running": "執行中",
+        "stopped": "已停止",
+        "error": "錯誤"
+    }
+}
