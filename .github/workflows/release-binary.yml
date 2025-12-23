@@ -12,7 +12,7 @@ env:
   SQLX_OFFLINE: true
 
 jobs:
-  release:
+  build:
     name: Cross build for ${{ matrix.target }}
     runs-on: ${{ matrix.os }}
     strategy:
@@ -124,13 +124,6 @@ jobs:
           mkdir -p migrations
           cp -r ../../../migrations/* migrations/
 
-      - uses: actions/upload-artifact@v4
-        with:
-          name: borui-${{ matrix.target }}
-          path: |
-            target/${{ matrix.target }}/release/${{ matrix.exe }}
-            target/${{ matrix.target }}/release/migrations/
-
       - name: Zip Release
         uses: TheDoctor0/zip-release@0.7.6
         with:
@@ -141,11 +134,38 @@ jobs:
             ${{ matrix.exe }}
             migrations
 
-      - name: Publish
-        uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/')
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
         with:
-          files: target/${{ matrix.target }}/release/borui-${{ matrix.target }}.zip
+          name: borui-${{ matrix.target }}
+          path: target/${{ matrix.target }}/release/borui-${{ matrix.target }}.zip
+
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Prepare release assets
+        run: |
+          mkdir -p release-assets
+          find artifacts -name "*.zip" -exec cp {} release-assets/ \;
+          ls -lh release-assets/
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release-assets/*.zip
           generate_release_notes: true
           draft: true
           token: ${{ secrets.GITHUB_TOKEN }}
+
