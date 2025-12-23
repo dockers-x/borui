@@ -122,7 +122,7 @@ jobs:
         run: |
           cd target/${{ matrix.target }}/release
           mkdir -p migrations
-          cp -r ${{ github.workspace }}/migrations/* migrations/
+          cp -r ../../../migrations/* migrations/
 
       - uses: actions/upload-artifact@v4
         with:
