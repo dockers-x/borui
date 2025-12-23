@@ -1,7 +1,17 @@
-# Multi-stage build for smaller image
-FROM rust:1.92-slim as builder
+# Multi-stage build for smaller image with dependency caching
 
+# Stage 1: Prepare recipe for dependency caching
+FROM rust:1.92-slim AS chef
+RUN cargo install cargo-chef
 WORKDIR /app
+
+# Stage 2: Analyze dependencies
+FROM chef AS planner
+COPY . .
+RUN cargo chef prepare --recipe-path recipe.json
+
+# Stage 3: Build dependencies (cached layer)
+FROM chef AS builder
 
 # Install build dependencies
 RUN apt-get update && apt-get install -y \
@@ -9,14 +19,17 @@ RUN apt-get update && apt-get install -y \
     libssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy all source files
-# (For dependency caching in a complex project, consider using cargo-chef)
-COPY . .
+WORKDIR /app
 
-# Build the application in release mode
+# Build dependencies first (this layer is cached unless dependencies change)
+COPY --from=planner /app/recipe.json recipe.json
+RUN cargo chef cook --release --recipe-path recipe.json
+
+# Copy source code and build application
+COPY . .
 RUN cargo build --release
 
-# Runtime stage - use minimal base image
+# Stage 4: Runtime stage - use minimal base image
 FROM debian:bookworm-slim
 
 # Install runtime dependencies
