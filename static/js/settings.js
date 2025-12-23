@@ -10,7 +10,7 @@ async function loadSettings() {
         document.getElementById('new-display-name').value = currentUser.display_name || '';
     } catch (error) {
         console.error('Failed to load user settings:', error);
-        alert('Failed to load user settings: ' + error.message);
+        toast.error(i18n.t('settings.loadError') + ': ' + error.message);
     }
 }
 
@@ -34,11 +34,11 @@ document.getElementById('display-name-form')?.addEventListener('submit', async (
         const updatedUser = await api.updateDisplayName(displayName);
         currentUser = updatedUser;
         updateCurrentUserDisplay();
-        alert('Display name updated successfully!');
+        toast.success(i18n.t('settings.displayNameSuccess'));
         displayNameInput.value = displayName || '';
     } catch (error) {
         console.error('Failed to update display name:', error);
-        alert('Failed to update display name: ' + error.message);
+        toast.error(i18n.t('settings.displayNameError') + ': ' + error.message);
     }
 });
 
@@ -50,29 +50,27 @@ document.getElementById('username-form')?.addEventListener('submit', async (e) =
     const newUsername = usernameInput.value.trim();
 
     if (!newUsername) {
-        alert('Username cannot be empty');
+        toast.error(i18n.t('settings.usernameEmpty'));
         return;
     }
 
     if (newUsername.length < 3) {
-        alert('Username must be at least 3 characters');
+        toast.error(i18n.t('settings.usernameLength'));
         return;
     }
 
-    if (!confirm(`Are you sure you want to change your username to "${newUsername}"?`)) {
-        return;
-    }
-
-    try {
-        const updatedUser = await api.updateUsername(newUsername);
-        currentUser = updatedUser;
-        updateCurrentUserDisplay();
-        alert('Username updated successfully!');
-        usernameInput.value = '';
-    } catch (error) {
-        console.error('Failed to update username:', error);
-        alert('Failed to update username: ' + error.message);
-    }
+    toast.confirm(i18n.t('settings.usernameConfirm').replace('{username}', newUsername), async () => {
+        try {
+            const updatedUser = await api.updateUsername(newUsername);
+            currentUser = updatedUser;
+            updateCurrentUserDisplay();
+            toast.success(i18n.t('settings.usernameSuccess'));
+            usernameInput.value = '';
+        } catch (error) {
+            console.error('Failed to update username:', error);
+            toast.error(i18n.t('settings.usernameError') + ': ' + error.message);
+        }
+    });
 });
 
 // Handle password form submission
@@ -88,30 +86,30 @@ document.getElementById('password-form')?.addEventListener('submit', async (e) =
     const confirmPassword = confirmPasswordInput.value;
 
     if (!currentPassword || !newPassword || !confirmPassword) {
-        alert('All password fields are required');
+        toast.error(i18n.t('settings.passwordRequired'));
         return;
     }
 
     if (newPassword.length < 6) {
-        alert('New password must be at least 6 characters');
+        toast.error(i18n.t('settings.passwordLength'));
         return;
     }
 
     if (newPassword !== confirmPassword) {
-        alert('New passwords do not match');
+        toast.error(i18n.t('settings.passwordMismatch'));
         return;
     }
 
     try {
         await api.updatePassword(currentPassword, newPassword);
-        alert('Password updated successfully!');
+        toast.success(i18n.t('settings.passwordSuccess'));
         // Clear form
         currentPasswordInput.value = '';
         newPasswordInput.value = '';
         confirmPasswordInput.value = '';
     } catch (error) {
         console.error('Failed to update password:', error);
-        alert('Failed to update password: ' + error.message);
+        toast.error(i18n.t('settings.passwordError') + ': ' + error.message);
     }
 });
 

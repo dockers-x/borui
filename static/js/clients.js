@@ -43,7 +43,7 @@ window.clientsUI = {
             return `
             <div class="item-card">
                 <div class="item-header">
-                    <div class="item-title">${client.name}</div>
+                    <div class="item-title">${client.name} <span class="item-id">#${client.id}</span></div>
                     <div class="item-status status-${client.status}" data-i18n="status.${client.status}">${client.status}</div>
                 </div>
                 <div class="item-details">
@@ -56,12 +56,13 @@ window.clientsUI = {
                 </div>
                 <div class="item-actions">
                     ${client.status === 'stopped' ?
-                        `<button class="btn-success" onclick="clientsUI.startClient(${client.id})" data-i18n="clients.start">Start</button>` :
+                        `<button class="btn-success" onclick="clientsUI.startClient(${client.id})">${getIcon('play')}<span data-i18n="clients.start">Start</span></button>` :
                         client.status === 'connected' ?
-                        `<button class="btn-danger" onclick="clientsUI.stopClient(${client.id})" data-i18n="clients.stop">Stop</button>` :
+                        `<button class="btn-danger" onclick="clientsUI.stopClient(${client.id})">${getIcon('stop')}<span data-i18n="clients.stop">Stop</span></button>` :
                         ''
                     }
-                    <button class="btn-danger" onclick="clientsUI.deleteClient(${client.id})" ${client.status !== 'stopped' ? 'disabled' : ''} data-i18n="clients.delete">Delete</button>
+                    <button class="btn-secondary" onclick="clientsUI.showEditForm(${client.id})" ${client.status !== 'stopped' ? 'disabled' : ''}>${getIcon('edit')}<span data-i18n="common.edit">Edit</span></button>
+                    <button class="btn-danger" onclick="clientsUI.deleteClient(${client.id})" ${client.status !== 'stopped' ? 'disabled' : ''}>${getIcon('trash')}<span data-i18n="common.delete">Delete</span></button>
                 </div>
             </div>
         `;
@@ -75,8 +76,9 @@ window.clientsUI = {
         try {
             await api.startClient(id);
             await this.loadClients();
+            toast.success(i18n.t('clients.startSuccess'));
         } catch (e) {
-            alert(`Failed to start client: ${e.message}`);
+            toast.error(i18n.t('clients.startError') + ': ' + e.message);
         }
     },
 
@@ -84,29 +86,68 @@ window.clientsUI = {
         try {
             await api.stopClient(id);
             await this.loadClients();
+            toast.success(i18n.t('clients.stopSuccess'));
         } catch (e) {
-            alert(`Failed to stop client: ${e.message}`);
+            toast.error(i18n.t('clients.stopError') + ': ' + e.message);
         }
     },
 
     async deleteClient(id) {
-        if (!confirm('Are you sure you want to delete this client?')) {
-            return;
-        }
-
-        try {
-            await api.deleteClient(id);
-            await this.loadClients();
-        } catch (e) {
-            alert(`Failed to delete client: ${e.message}`);
-        }
+        toast.confirm(i18n.t('clients.deleteConfirm'), async () => {
+            try {
+                await api.deleteClient(id);
+                await this.loadClients();
+                toast.success(i18n.t('clients.deleteSuccess'));
+            } catch (e) {
+                toast.error(i18n.t('clients.deleteError') + ': ' + e.message);
+            }
+        });
     },
 
     showCreateForm() {
+        this.showForm(null);
+    },
+
+    async showEditForm(id) {
+        try {
+            const client = await api.getClient(id);
+            this.showForm(client);
+        } catch (e) {
+            toast.error(i18n.t('clients.loadError') + ': ' + e.message);
+        }
+    },
+
+    showForm(client = null) {
         const modal = document.getElementById('client-modal');
         const form = document.getElementById('client-form');
+        const modalTitle = document.getElementById('client-modal-title');
+        const submitBtn = form.querySelector('button[type="submit"]');
+
+        // Update modal title and button text based on mode
+        if (client) {
+            modalTitle.textContent = i18n.t('clients.editTitle') || 'Edit Client';
+            submitBtn.textContent = i18n.t('common.save') || 'Save';
+            submitBtn.setAttribute('data-i18n', 'common.save');
+        } else {
+            modalTitle.textContent = i18n.t('clients.modalTitle') || 'Create Client';
+            submitBtn.textContent = i18n.t('common.create') || 'Create';
+            submitBtn.setAttribute('data-i18n', 'common.create');
+        }
 
         form.reset();
+
+        // If editing, populate form with client data
+        if (client) {
+            document.getElementById('client-name').value = client.name;
+            document.getElementById('client-description').value = client.description || '';
+            document.getElementById('client-local-host').value = client.local_host;
+            document.getElementById('client-local-port').value = client.local_port;
+            document.getElementById('client-remote-server').value = client.remote_server;
+            document.getElementById('client-remote-port').value = client.remote_port;
+            document.getElementById('client-secret').value = client.secret || '';
+            document.getElementById('client-auto-start').checked = client.auto_start || false;
+        }
+
         modal.classList.add('show');
 
         // Remove old event listener and add new one
@@ -128,10 +169,15 @@ window.clientsUI = {
             };
 
             try {
-                await this.createClient(data);
+                if (client) {
+                    await this.updateClient(client.id, data);
+                } else {
+                    await this.createClient(data);
+                }
                 closeClientModal();
             } catch (e) {
-                alert(`Failed to create client: ${e.message}`);
+                const errorKey = client ? 'clients.updateError' : 'clients.createError';
+                toast.error(i18n.t(errorKey) + ': ' + e.message);
             }
         });
     },
@@ -140,6 +186,17 @@ window.clientsUI = {
         try {
             await api.createClient(data);
             await this.loadClients();
+            toast.success(i18n.t('clients.createSuccess'));
+        } catch (e) {
+            throw e;
+        }
+    },
+
+    async updateClient(id, data) {
+        try {
+            await api.updateClient(id, data);
+            await this.loadClients();
+            toast.success(i18n.t('clients.updateSuccess'));
         } catch (e) {
             throw e;
         }

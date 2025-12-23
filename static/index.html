@@ -13,7 +13,6 @@
             <a href="#servers" class="nav-link active" data-i18n="nav.servers">Servers</a>
             <a href="#clients" class="nav-link" data-i18n="nav.clients">Clients</a>
             <a href="#system" class="nav-link" data-i18n="nav.system">System</a>
-            <a href="#settings" class="nav-link" data-i18n="nav.settings">Settings</a>
         </div>
         <div class="nav-actions">
             <select id="language-selector" class="lang-select">
@@ -21,7 +20,23 @@
                 <option value="zh-CN">简体中文</option>
                 <option value="zh-TW">繁體中文</option>
             </select>
-            <button id="logout-btn" class="btn-logout" onclick="logout()">Logout</button>
+            <div class="user-menu">
+                <button class="user-menu-button" id="user-menu-button">
+                    <span id="user-display-name">Loading...</span>
+                    <span class="icon" id="user-menu-icon"></span>
+                </button>
+                <div class="user-menu-dropdown" id="user-menu-dropdown">
+                    <a href="#settings" class="user-menu-item">
+                        <span class="icon" id="settings-icon"></span>
+                        <span data-i18n="nav.settings">Settings</span>
+                    </a>
+                    <div class="user-menu-divider"></div>
+                    <button class="user-menu-item" onclick="logout()">
+                        <span class="icon" id="logout-icon"></span>
+                        <span data-i18n="common.logout">Logout</span>
+                    </button>
+                </div>
+            </div>
         </div>
     </nav>
 
@@ -29,7 +44,10 @@
         <div id="servers-view" class="view active">
             <div class="view-header">
                 <h1 data-i18n="servers.title">Bore Servers</h1>
-                <button id="create-server-btn" class="btn-primary" data-i18n="servers.create">Create Server</button>
+                <button id="create-server-btn" class="btn-primary">
+                    <span class="icon" id="create-server-icon"></span>
+                    <span data-i18n="servers.create">Create Server</span>
+                </button>
             </div>
             <div id="servers-list" class="items-list">
                 <p class="loading" data-i18n="common.loading">Loading...</p>
@@ -39,7 +57,10 @@
         <div id="clients-view" class="view">
             <div class="view-header">
                 <h1 data-i18n="clients.title">Bore Clients</h1>
-                <button id="create-client-btn" class="btn-primary" data-i18n="clients.create">Create Client</button>
+                <button id="create-client-btn" class="btn-primary">
+                    <span class="icon" id="create-client-icon"></span>
+                    <span data-i18n="clients.create">Create Client</span>
+                </button>
             </div>
             <div id="clients-list" class="items-list">
                 <p class="loading" data-i18n="common.loading">Loading...</p>
@@ -160,7 +181,12 @@
                 </div>
                 <div class="form-group">
                     <label for="server-secret" data-i18n="servers.secret">Secret (Optional)</label>
-                    <input type="password" id="server-secret">
+                    <div class="password-input-wrapper">
+                        <input type="password" id="server-secret" class="password-input">
+                        <button type="button" class="password-toggle" onclick="togglePasswordVisibility('server-secret')" aria-label="Toggle password visibility">
+                            <span class="password-toggle-icon"></span>
+                        </button>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label>
@@ -215,7 +241,12 @@
                 </div>
                 <div class="form-group">
                     <label for="client-secret" data-i18n="clients.secret">Secret (Optional)</label>
-                    <input type="password" id="client-secret">
+                    <div class="password-input-wrapper">
+                        <input type="password" id="client-secret" class="password-input">
+                        <button type="button" class="password-toggle" onclick="togglePasswordVisibility('client-secret')" aria-label="Toggle password visibility">
+                            <span class="password-toggle-icon"></span>
+                        </button>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label>
@@ -239,6 +270,8 @@
     </div>
 
     <script src="/js/i18n.js"></script>
+    <script src="/js/icons.js"></script>
+    <script src="/js/toast.js"></script>
     <script src="/js/api.js"></script>
     <script src="/js/websocket.js"></script>
     <script src="/js/servers.js"></script>

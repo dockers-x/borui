@@ -12,7 +12,6 @@ services:
       - "10000-10100:10000-10100"  # Tunnel ports range
     volumes:
       - ./data:/app/data
-      - ./config:/app/config
     environment:
       - DATABASE_URL=sqlite:///app/data/borui.db
       - BIND_ADDR=0.0.0.0:3000

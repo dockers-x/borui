@@ -29,7 +29,7 @@ window.serversUI = {
             return `
             <div class="item-card">
                 <div class="item-header">
-                    <div class="item-title">${server.name}</div>
+                    <div class="item-title">${server.name} <span class="item-id">#${server.id}</span></div>
                     <div class="item-status status-${server.status}" data-i18n="status.${server.status}">${server.status}</div>
                 </div>
                 <div class="item-details">
@@ -42,12 +42,13 @@ window.serversUI = {
                 </div>
                 <div class="item-actions">
                     ${server.status === 'stopped' ?
-                        `<button class="btn-success" onclick="serversUI.startServer(${server.id})" data-i18n="servers.start">Start</button>` :
+                        `<button class="btn-success" onclick="serversUI.startServer(${server.id})">${getIcon('play')}<span data-i18n="servers.start">Start</span></button>` :
                         server.status === 'running' ?
-                        `<button class="btn-danger" onclick="serversUI.stopServer(${server.id})" data-i18n="servers.stop">Stop</button>` :
+                        `<button class="btn-danger" onclick="serversUI.stopServer(${server.id})">${getIcon('stop')}<span data-i18n="servers.stop">Stop</span></button>` :
                         ''
                     }
-                    <button class="btn-danger" onclick="serversUI.deleteServer(${server.id})" ${server.status !== 'stopped' ? 'disabled' : ''} data-i18n="servers.delete">Delete</button>
+                    <button class="btn-secondary" onclick="serversUI.showEditForm(${server.id})" ${server.status !== 'stopped' ? 'disabled' : ''}>${getIcon('edit')}<span data-i18n="common.edit">Edit</span></button>
+                    <button class="btn-danger" onclick="serversUI.deleteServer(${server.id})" ${server.status !== 'stopped' ? 'disabled' : ''}>${getIcon('trash')}<span data-i18n="common.delete">Delete</span></button>
                 </div>
             </div>
         `;
@@ -58,10 +59,49 @@ window.serversUI = {
     },
 
     showCreateForm() {
+        this.showForm(null);
+    },
+
+    async showEditForm(id) {
+        try {
+            const server = await api.getServer(id);
+            this.showForm(server);
+        } catch (e) {
+            toast.error(i18n.t('servers.loadError') + ': ' + e.message);
+        }
+    },
+
+    showForm(server = null) {
         const modal = document.getElementById('server-modal');
         const form = document.getElementById('server-form');
+        const modalTitle = document.getElementById('server-modal-title');
+        const submitBtn = form.querySelector('button[type="submit"]');
+
+        // Update modal title and button text based on mode
+        if (server) {
+            modalTitle.textContent = i18n.t('servers.editTitle') || 'Edit Server';
+            submitBtn.textContent = i18n.t('common.save') || 'Save';
+            submitBtn.setAttribute('data-i18n', 'common.save');
+        } else {
+            modalTitle.textContent = i18n.t('servers.modalTitle') || 'Create Server';
+            submitBtn.textContent = i18n.t('common.create') || 'Create';
+            submitBtn.setAttribute('data-i18n', 'common.create');
+        }
 
         form.reset();
+
+        // If editing, populate form with server data
+        if (server) {
+            document.getElementById('server-name').value = server.name;
+            document.getElementById('server-description').value = server.description || '';
+            document.getElementById('server-bind-addr').value = server.bind_addr;
+            document.getElementById('server-bind-tunnels').value = server.bind_tunnels || server.bind_addr;
+            document.getElementById('server-port-start').value = server.port_range_start;
+            document.getElementById('server-port-end').value = server.port_range_end;
+            document.getElementById('server-secret').value = server.secret || '';
+            document.getElementById('server-auto-start').checked = server.auto_start || false;
+        }
+
         modal.classList.add('show');
 
         // Remove old event listener and add new one
@@ -83,10 +123,15 @@ window.serversUI = {
             };
 
             try {
-                await this.createServer(data);
+                if (server) {
+                    await this.updateServer(server.id, data);
+                } else {
+                    await this.createServer(data);
+                }
                 closeServerModal();
             } catch (e) {
-                alert(`Failed to create server: ${e.message}`);
+                const errorKey = server ? 'servers.updateError' : 'servers.createError';
+                toast.error(i18n.t(errorKey) + ': ' + e.message);
             }
         });
     },
@@ -95,6 +140,17 @@ window.serversUI = {
         try {
             await api.createServer(data);
             await this.loadServers();
+            toast.success(i18n.t('servers.createSuccess'));
+        } catch (e) {
+            throw e;
+        }
+    },
+
+    async updateServer(id, data) {
+        try {
+            await api.updateServer(id, data);
+            await this.loadServers();
+            toast.success(i18n.t('servers.updateSuccess'));
         } catch (e) {
             throw e;
         }
@@ -104,8 +160,9 @@ window.serversUI = {
         try {
             await api.startServer(id);
             await this.loadServers();
+            toast.success(i18n.t('servers.startSuccess'));
         } catch (e) {
-            alert(`Failed to start server: ${e.message}`);
+            toast.error(i18n.t('servers.startError') + ': ' + e.message);
         }
     },
 
@@ -113,21 +170,21 @@ window.serversUI = {
         try {
             await api.stopServer(id);
             await this.loadServers();
+            toast.success(i18n.t('servers.stopSuccess'));
         } catch (e) {
-            alert(`Failed to stop server: ${e.message}`);
+            toast.error(i18n.t('servers.stopError') + ': ' + e.message);
         }
     },
 
     async deleteServer(id) {
-        if (!confirm('Are you sure you want to delete this server?')) {
-            return;
-        }
-
-        try {
-            await api.deleteServer(id);
-            await this.loadServers();
-        } catch (e) {
-            alert(`Failed to delete server: ${e.message}`);
-        }
+        toast.confirm(i18n.t('servers.deleteConfirm'), async () => {
+            try {
+                await api.deleteServer(id);
+                await this.loadServers();
+                toast.success(i18n.t('servers.deleteSuccess'));
+            } catch (e) {
+                toast.error(i18n.t('servers.deleteError') + ': ' + e.message);
+            }
+        });
     }
 };

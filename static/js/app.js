@@ -10,6 +10,54 @@
     // Load i18n
     await i18n.loadLocale(i18n.locale);
 
+    // Initialize icons
+    document.getElementById('user-menu-icon').innerHTML = icons.chevronDown;
+    document.getElementById('settings-icon').innerHTML = icons.settings;
+    document.getElementById('logout-icon').innerHTML = icons.logOut;
+    document.getElementById('create-server-icon').innerHTML = icons.plus;
+    document.getElementById('create-client-icon').innerHTML = icons.plus;
+
+    // Initialize password toggle icons
+    document.querySelectorAll('.password-toggle-icon').forEach(icon => {
+        icon.innerHTML = icons.eye;
+    });
+
+    // Load user info
+    try {
+        const user = await api.getCurrentUser();
+        const displayName = user.display_name || user.username;
+        document.getElementById('user-display-name').textContent = displayName;
+    } catch (e) {
+        console.error('Failed to load user info:', e);
+        document.getElementById('user-display-name').textContent = 'User';
+    }
+
+    // Setup user menu
+    const userMenuButton = document.getElementById('user-menu-button');
+    const userMenuDropdown = document.getElementById('user-menu-dropdown');
+
+    userMenuButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        userMenuDropdown.classList.toggle('show');
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', () => {
+        userMenuDropdown.classList.remove('show');
+    });
+
+    // Handle menu item clicks - settings link and logout are handled here
+    userMenuDropdown.addEventListener('click', (e) => {
+        e.stopPropagation();
+
+        const settingsLink = e.target.closest('a[href="#settings"]');
+        if (settingsLink) {
+            e.preventDefault();
+            showView('settings');
+            userMenuDropdown.classList.remove('show');
+        }
+    });
+
     // Setup language selector
     const langSelector = document.getElementById('language-selector');
     langSelector.value = i18n.locale;
@@ -23,6 +71,7 @@
             e.preventDefault();
             const target = e.target.getAttribute('href').substring(1);
             showView(target);
+            userMenuDropdown.classList.remove('show');
         });
     });
 
@@ -137,4 +186,19 @@ function closeServerModal() {
 function closeClientModal() {
     document.getElementById('client-modal').classList.remove('show');
     document.getElementById('client-form').reset();
+}
+
+// Toggle password visibility
+function togglePasswordVisibility(inputId) {
+    const input = document.getElementById(inputId);
+    const button = input.parentElement.querySelector('.password-toggle');
+    const iconSpan = button.querySelector('.password-toggle-icon');
+
+    if (input.type === 'password') {
+        input.type = 'text';
+        iconSpan.innerHTML = icons.eyeOff;
+    } else {
+        input.type = 'password';
+        iconSpan.innerHTML = icons.eye;
+    }
 }

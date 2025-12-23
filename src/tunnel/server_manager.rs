@@ -14,7 +14,6 @@ pub struct ServerManager {
 }
 
 struct ServerHandle {
-    id: i64,
     handle: JoinHandle<anyhow::Result<()>>,
     started_at: SystemTime,
     _tx: mpsc::Sender<ServerCommand>,
@@ -82,7 +81,6 @@ impl ServerManager {
         self.servers.insert(
             server_id,
             ServerHandle {
-                id: server_id,
                 handle,
                 started_at: SystemTime::now(),
                 _tx,

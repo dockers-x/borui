@@ -13,7 +13,6 @@ pub struct ClientManager {
 }
 
 struct ClientHandle {
-    id: i64,
     assigned_port: u16,
     handle: JoinHandle<anyhow::Result<()>>,
     started_at: SystemTime,
@@ -97,7 +96,6 @@ impl ClientManager {
         self.clients.insert(
             client_id,
             ClientHandle {
-                id: client_id,
                 assigned_port,
                 handle,
                 started_at: SystemTime::now(),
