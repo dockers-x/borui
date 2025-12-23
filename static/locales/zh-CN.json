@@ -4,25 +4,80 @@
         "clients": "客户端",
         "system": "系统"
     },
+    "login": {
+        "title": "Borui",
+        "subtitle": "隧道管理平台",
+        "username": "用户名",
+        "password": "密码",
+        "loginButton": "登录",
+        "loggingIn": "登录中..."
+    },
     "servers": {
         "title": "Bore 服务器",
-        "create": "创建服务器"
+        "create": "创建服务器",
+        "modalTitle": "创建服务器",
+        "name": "名称",
+        "description": "描述",
+        "bindAddr": "绑定地址",
+        "bindAddrHelp": "服务器控制地址",
+        "bindTunnels": "隧道绑定地址（可选）",
+        "bindTunnelsHelp": "隧道流量地址。大多数情况下与绑定地址保持一致即可",
+        "portRangeStart": "端口范围起始",
+        "portRangeEnd": "端口范围结束",
+        "secret": "密钥（可选）",
+        "autoStart": "应用启动时自动启动",
+        "start": "启动",
+        "stop": "停止",
+        "delete": "删除",
+        "auth": "认证",
+        "authEnabled": "已启用",
+        "noServers": "未找到服务器。创建一个开始吧！"
     },
     "clients": {
         "title": "Bore 客户端",
-        "create": "创建客户端"
+        "create": "创建客户端",
+        "modalTitle": "创建客户端",
+        "name": "名称",
+        "description": "描述",
+        "localHost": "本地主机",
+        "localPort": "本地端口",
+        "remoteServer": "远程服务器",
+        "remotePort": "远程端口",
+        "remotePortHelp": "0 = 自动分配，或指定端口号",
+        "secret": "密钥（可选）",
+        "autoStart": "应用启动时自动启动",
+        "start": "启动",
+        "stop": "停止",
+        "delete": "删除",
+        "local": "本地",
+        "remote": "远程",
+        "auth": "认证",
+        "authEnabled": "已启用",
+        "noClients": "未找到客户端。创建一个开始吧！"
     },
     "system": {
-        "title": "系统信息"
+        "title": "系统信息",
+        "version": "版本",
+        "databaseStatus": "数据库状态",
+        "totalServers": "服务器总数",
+        "totalClients": "客户端总数",
+        "serversRunning": "运行中的服务器",
+        "clientsConnected": "已连接的客户端"
     },
     "common": {
-        "loading": "加载中..."
+        "loading": "加载中...",
+        "cancel": "取消",
+        "create": "创建",
+        "save": "保存",
+        "required": "*",
+        "noDescription": "无描述"
     },
     "status": {
         "connected": "已连接",
         "disconnected": "未连接",
         "running": "运行中",
         "stopped": "已停止",
-        "error": "错误"
+        "error": "错误",
+        "starting": "启动中"
     }
 }

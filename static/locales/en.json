@@ -4,25 +4,80 @@
         "clients": "Clients",
         "system": "System"
     },
+    "login": {
+        "title": "Borui",
+        "subtitle": "Tunnel Management Platform",
+        "username": "Username",
+        "password": "Password",
+        "loginButton": "Login",
+        "loggingIn": "Logging in..."
+    },
     "servers": {
         "title": "Bore Servers",
-        "create": "Create Server"
+        "create": "Create Server",
+        "modalTitle": "Create Server",
+        "name": "Name",
+        "description": "Description",
+        "bindAddr": "Bind Address",
+        "bindAddrHelp": "Server control address",
+        "bindTunnels": "Bind Tunnels (Optional)",
+        "bindTunnelsHelp": "Tunnel traffic address. Leave same as bind address in most cases",
+        "portRangeStart": "Port Range Start",
+        "portRangeEnd": "Port Range End",
+        "secret": "Secret (Optional)",
+        "autoStart": "Auto-start on application boot",
+        "start": "Start",
+        "stop": "Stop",
+        "delete": "Delete",
+        "auth": "Auth",
+        "authEnabled": "Enabled",
+        "noServers": "No servers found. Create one to get started!"
     },
     "clients": {
         "title": "Bore Clients",
-        "create": "Create Client"
+        "create": "Create Client",
+        "modalTitle": "Create Client",
+        "name": "Name",
+        "description": "Description",
+        "localHost": "Local Host",
+        "localPort": "Local Port",
+        "remoteServer": "Remote Server",
+        "remotePort": "Remote Port",
+        "remotePortHelp": "0 = auto-assign, or specify a port number",
+        "secret": "Secret (Optional)",
+        "autoStart": "Auto-start on application boot",
+        "start": "Start",
+        "stop": "Stop",
+        "delete": "Delete",
+        "local": "Local",
+        "remote": "Remote",
+        "auth": "Auth",
+        "authEnabled": "Enabled",
+        "noClients": "No clients found. Create one to get started!"
     },
     "system": {
-        "title": "System Information"
+        "title": "System Information",
+        "version": "Version",
+        "databaseStatus": "Database Status",
+        "totalServers": "Total Servers",
+        "totalClients": "Total Clients",
+        "serversRunning": "Servers Running",
+        "clientsConnected": "Clients Connected"
     },
     "common": {
-        "loading": "Loading..."
+        "loading": "Loading...",
+        "cancel": "Cancel",
+        "create": "Create",
+        "save": "Save",
+        "required": "*",
+        "noDescription": "No description"
     },
     "status": {
         "connected": "Connected",
         "disconnected": "Disconnected",
         "running": "Running",
         "stopped": "Stopped",
-        "error": "Error"
+        "error": "Error",
+        "starting": "Starting"
     }
 }

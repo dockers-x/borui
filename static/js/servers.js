@@ -2,7 +2,8 @@
 window.serversUI = {
     async loadServers() {
         const container = document.getElementById('servers-list');
-        container.innerHTML = '<p class="loading">Loading...</p>';
+        container.innerHTML = '<p class="loading" data-i18n="common.loading">Loading...</p>';
+        i18n.applyTranslations();
 
         try {
             const servers = await api.listServers();
@@ -16,35 +17,44 @@ window.serversUI = {
         const container = document.getElementById('servers-list');
 
         if (servers.length === 0) {
-            container.innerHTML = '<p class="loading">No servers found. Create one to get started!</p>';
+            container.innerHTML = `<p class="loading" data-i18n="servers.noServers">No servers found. Create one to get started!</p>`;
+            i18n.applyTranslations();
             return;
         }
 
-        container.innerHTML = servers.map(server => `
+        container.innerHTML = servers.map(server => {
+            const description = server.description || `<span data-i18n="common.noDescription">No description</span>`;
+            const authInfo = server.secret ? `<br><strong data-i18n="servers.auth">Auth</strong>: <span data-i18n="servers.authEnabled">Enabled</span>` : '';
+
+            return `
             <div class="item-card">
                 <div class="item-header">
                     <div class="item-title">${server.name}</div>
-                    <div class="item-status status-${server.status}">${server.status}</div>
+                    <div class="item-status status-${server.status}" data-i18n="status.${server.status}">${server.status}</div>
                 </div>
                 <div class="item-details">
-                    ${server.description || 'No description'}
+                    ${description}
                     <br>
                     <strong>Address:</strong> ${server.bind_addr}
                     <br>
                     <strong>Port Range:</strong> ${server.port_range_start}-${server.port_range_end}
-                    ${server.secret ? '<br><strong>Auth:</strong> Enabled' : ''}
+                    ${authInfo}
                 </div>
                 <div class="item-actions">
                     ${server.status === 'stopped' ?
-                        `<button class="btn-success" onclick="serversUI.startServer(${server.id})">Start</button>` :
+                        `<button class="btn-success" onclick="serversUI.startServer(${server.id})" data-i18n="servers.start">Start</button>` :
                         server.status === 'running' ?
-                        `<button class="btn-danger" onclick="serversUI.stopServer(${server.id})">Stop</button>` :
+                        `<button class="btn-danger" onclick="serversUI.stopServer(${server.id})" data-i18n="servers.stop">Stop</button>` :
                         ''
                     }
-                    <button class="btn-danger" onclick="serversUI.deleteServer(${server.id})" ${server.status !== 'stopped' ? 'disabled' : ''}>Delete</button>
+                    <button class="btn-danger" onclick="serversUI.deleteServer(${server.id})" ${server.status !== 'stopped' ? 'disabled' : ''} data-i18n="servers.delete">Delete</button>
                 </div>
             </div>
-        `).join('');
+        `;
+        }).join('');
+
+        // Apply translations to dynamically generated content
+        i18n.applyTranslations();
     },
 
     showCreateForm() {

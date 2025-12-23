@@ -48,7 +48,8 @@
 
     async function loadSystemInfo() {
         const container = document.getElementById('system-info');
-        container.innerHTML = '<p class="loading">Loading...</p>';
+        container.innerHTML = '<p class="loading" data-i18n="common.loading">Loading...</p>';
+        i18n.applyTranslations();
 
         try {
             const [health, version, stats] = await Promise.all([
@@ -59,30 +60,33 @@
 
             container.innerHTML = `
                 <div class="info-item">
-                    <div class="info-label">Version</div>
+                    <div class="info-label" data-i18n="system.version">Version</div>
                     <div class="info-value">${version.version}</div>
                 </div>
                 <div class="info-item">
-                    <div class="info-label">Database Status</div>
+                    <div class="info-label" data-i18n="system.databaseStatus">Database Status</div>
                     <div class="info-value">${health.database}</div>
                 </div>
                 <div class="info-item">
-                    <div class="info-label">Total Servers</div>
+                    <div class="info-label" data-i18n="system.totalServers">Total Servers</div>
                     <div class="info-value">${stats.total_servers}</div>
                 </div>
                 <div class="info-item">
-                    <div class="info-label">Total Clients</div>
+                    <div class="info-label" data-i18n="system.totalClients">Total Clients</div>
                     <div class="info-value">${stats.total_clients}</div>
                 </div>
                 <div class="info-item">
-                    <div class="info-label">Servers Running</div>
+                    <div class="info-label" data-i18n="system.serversRunning">Servers Running</div>
                     <div class="info-value">${stats.servers_running}</div>
                 </div>
                 <div class="info-item">
-                    <div class="info-label">Clients Connected</div>
+                    <div class="info-label" data-i18n="system.clientsConnected">Clients Connected</div>
                     <div class="info-value">${stats.clients_connected}</div>
                 </div>
             `;
+
+            // Apply translations to dynamically generated content
+            i18n.applyTranslations();
         } catch (e) {
             container.innerHTML = `<p class="error">Failed to load system info: ${e.message}</p>`;
         }

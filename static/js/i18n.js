@@ -51,6 +51,11 @@ class I18n {
             el.textContent = this.t(key);
         });
     }
+
+    // Alias for backward compatibility
+    applyTranslations() {
+        this.updateUI();
+    }
 }
 
 // Global i18n instance

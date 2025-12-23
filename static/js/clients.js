@@ -2,7 +2,8 @@
 window.clientsUI = {
     async loadClients() {
         const container = document.getElementById('clients-list');
-        container.innerHTML = '<p class="loading">Loading...</p>';
+        container.innerHTML = '<p class="loading" data-i18n="common.loading">Loading...</p>';
+        i18n.applyTranslations();
 
         try {
             const clients = await api.listClients();
@@ -16,7 +17,8 @@ window.clientsUI = {
         const container = document.getElementById('clients-list');
 
         if (clients.length === 0) {
-            container.innerHTML = '<p class="loading">No clients found. Create one to get started!</p>';
+            container.innerHTML = `<p class="loading" data-i18n="clients.noClients">No clients found. Create one to get started!</p>`;
+            i18n.applyTranslations();
             return;
         }
 
@@ -35,32 +37,38 @@ window.clientsUI = {
                 remotePortDisplay = `:${client.remote_port}`;
             }
 
+            const description = client.description || `<span data-i18n="common.noDescription">No description</span>`;
+            const authInfo = client.secret ? `<br><strong data-i18n="clients.auth">Auth</strong>: <span data-i18n="clients.authEnabled">Enabled</span>` : '';
+
             return `
             <div class="item-card">
                 <div class="item-header">
                     <div class="item-title">${client.name}</div>
-                    <div class="item-status status-${client.status}">${client.status}</div>
+                    <div class="item-status status-${client.status}" data-i18n="status.${client.status}">${client.status}</div>
                 </div>
                 <div class="item-details">
-                    ${client.description || 'No description'}
+                    ${description}
                     <br>
-                    <strong>Local:</strong> ${client.local_host}:${client.local_port}
+                    <strong data-i18n="clients.local">Local</strong>: ${client.local_host}:${client.local_port}
                     <br>
-                    <strong>Remote:</strong> ${client.remote_server}${remotePortDisplay}
-                    ${client.secret ? '<br><strong>Auth:</strong> Enabled' : ''}
+                    <strong data-i18n="clients.remote">Remote</strong>: ${client.remote_server}${remotePortDisplay}
+                    ${authInfo}
                 </div>
                 <div class="item-actions">
                     ${client.status === 'stopped' ?
-                        `<button class="btn-success" onclick="clientsUI.startClient(${client.id})">Start</button>` :
+                        `<button class="btn-success" onclick="clientsUI.startClient(${client.id})" data-i18n="clients.start">Start</button>` :
                         client.status === 'connected' ?
-                        `<button class="btn-danger" onclick="clientsUI.stopClient(${client.id})">Stop</button>` :
+                        `<button class="btn-danger" onclick="clientsUI.stopClient(${client.id})" data-i18n="clients.stop">Stop</button>` :
                         ''
                     }
-                    <button class="btn-danger" onclick="clientsUI.deleteClient(${client.id})" ${client.status !== 'stopped' ? 'disabled' : ''}>Delete</button>
+                    <button class="btn-danger" onclick="clientsUI.deleteClient(${client.id})" ${client.status !== 'stopped' ? 'disabled' : ''} data-i18n="clients.delete">Delete</button>
                 </div>
             </div>
         `;
         }).join('');
+
+        // Apply translations to dynamically generated content
+        i18n.applyTranslations();
     },
 
     async startClient(id) {

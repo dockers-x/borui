@@ -59,51 +59,53 @@
     <div id="server-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 id="server-modal-title">Create Server</h2>
+                <h2 id="server-modal-title" data-i18n="servers.modalTitle">Create Server</h2>
                 <span class="close" onclick="closeServerModal()">&times;</span>
             </div>
             <form id="server-form">
                 <div class="form-group">
-                    <label for="server-name">Name *</label>
+                    <label for="server-name"><span data-i18n="servers.name">Name</span> <span data-i18n="common.required">*</span></label>
                     <input type="text" id="server-name" required>
                 </div>
                 <div class="form-group">
-                    <label for="server-description">Description</label>
+                    <label for="server-description" data-i18n="servers.description">Description</label>
                     <input type="text" id="server-description">
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="server-bind-addr">Bind Address</label>
+                        <label for="server-bind-addr" data-i18n="servers.bindAddr">Bind Address</label>
                         <input type="text" id="server-bind-addr" value="0.0.0.0">
+                        <small class="form-help" data-i18n="servers.bindAddrHelp">Control server address for client connections</small>
                     </div>
                     <div class="form-group">
-                        <label for="server-bind-tunnels">Bind Tunnels</label>
+                        <label for="server-bind-tunnels" data-i18n="servers.bindTunnels">Bind Tunnels</label>
                         <input type="text" id="server-bind-tunnels" value="0.0.0.0">
+                        <small class="form-help" data-i18n="servers.bindTunnelsHelp">Tunnel data address, defaults to bind address</small>
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="server-port-start">Port Range Start</label>
+                        <label for="server-port-start" data-i18n="servers.portRangeStart">Port Range Start</label>
                         <input type="number" id="server-port-start" value="1024" min="1024" max="65535">
                     </div>
                     <div class="form-group">
-                        <label for="server-port-end">Port Range End</label>
+                        <label for="server-port-end" data-i18n="servers.portRangeEnd">Port Range End</label>
                         <input type="number" id="server-port-end" value="65535" min="1024" max="65535">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="server-secret">Secret (Optional)</label>
+                    <label for="server-secret" data-i18n="servers.secret">Secret (Optional)</label>
                     <input type="password" id="server-secret">
                 </div>
                 <div class="form-group">
                     <label>
                         <input type="checkbox" id="server-auto-start">
-                        Auto-start on application boot
+                        <span data-i18n="servers.autoStart">Auto-start on application boot</span>
                     </label>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn-secondary" onclick="closeServerModal()">Cancel</button>
-                    <button type="submit" class="btn-primary">Create</button>
+                    <button type="button" class="btn-secondary" onclick="closeServerModal()" data-i18n="common.cancel">Cancel</button>
+                    <button type="submit" class="btn-primary" data-i18n="common.create">Create</button>
                 </div>
             </form>
         </div>
@@ -113,52 +115,52 @@
     <div id="client-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 id="client-modal-title">Create Client</h2>
+                <h2 id="client-modal-title" data-i18n="clients.modalTitle">Create Client</h2>
                 <span class="close" onclick="closeClientModal()">&times;</span>
             </div>
             <form id="client-form">
                 <div class="form-group">
-                    <label for="client-name">Name *</label>
+                    <label for="client-name"><span data-i18n="clients.name">Name</span> <span data-i18n="common.required">*</span></label>
                     <input type="text" id="client-name" required>
                 </div>
                 <div class="form-group">
-                    <label for="client-description">Description</label>
+                    <label for="client-description" data-i18n="clients.description">Description</label>
                     <input type="text" id="client-description">
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="client-local-host">Local Host</label>
+                        <label for="client-local-host" data-i18n="clients.localHost">Local Host</label>
                         <input type="text" id="client-local-host" value="localhost">
                     </div>
                     <div class="form-group">
-                        <label for="client-local-port">Local Port *</label>
+                        <label for="client-local-port"><span data-i18n="clients.localPort">Local Port</span> <span data-i18n="common.required">*</span></label>
                         <input type="number" id="client-local-port" required min="1" max="65535">
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="client-remote-server">Remote Server *</label>
+                        <label for="client-remote-server"><span data-i18n="clients.remoteServer">Remote Server</span> <span data-i18n="common.required">*</span></label>
                         <input type="text" id="client-remote-server" required placeholder="example.com">
                     </div>
                     <div class="form-group">
-                        <label for="client-remote-port">Remote Port</label>
+                        <label for="client-remote-port" data-i18n="clients.remotePort">Remote Port</label>
                         <input type="number" id="client-remote-port" value="0" min="0" max="65535">
-                        <small class="form-help">0 = auto-assign, or specify a port number</small>
+                        <small class="form-help" data-i18n="clients.remotePortHelp">0 = auto-assign, or specify a port number</small>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="client-secret">Secret (Optional)</label>
+                    <label for="client-secret" data-i18n="clients.secret">Secret (Optional)</label>
                     <input type="password" id="client-secret">
                 </div>
                 <div class="form-group">
                     <label>
                         <input type="checkbox" id="client-auto-start">
-                        Auto-start on application boot
+                        <span data-i18n="clients.autoStart">Auto-start on application boot</span>
                     </label>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn-secondary" onclick="closeClientModal()">Cancel</button>
-                    <button type="submit" class="btn-primary">Create</button>
+                    <button type="button" class="btn-secondary" onclick="closeClientModal()" data-i18n="common.cancel">Cancel</button>
+                    <button type="submit" class="btn-primary" data-i18n="common.create">Create</button>
                 </div>
             </form>
         </div>
