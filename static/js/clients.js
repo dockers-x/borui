@@ -20,7 +20,22 @@ window.clientsUI = {
             return;
         }
 
-        container.innerHTML = clients.map(client => `
+        container.innerHTML = clients.map(client => {
+            // Determine remote port display
+            let remotePortDisplay = '';
+            if (client.remote_port === 0) {
+                // Auto-assign mode
+                if (client.assigned_port) {
+                    remotePortDisplay = `:${client.assigned_port} <span class="badge">auto-assigned</span>`;
+                } else {
+                    remotePortDisplay = ' <span class="badge">auto-assign</span>';
+                }
+            } else {
+                // User specified port
+                remotePortDisplay = `:${client.remote_port}`;
+            }
+
+            return `
             <div class="item-card">
                 <div class="item-header">
                     <div class="item-title">${client.name}</div>
@@ -31,7 +46,8 @@ window.clientsUI = {
                     <br>
                     <strong>Local:</strong> ${client.local_host}:${client.local_port}
                     <br>
-                    <strong>Remote:</strong> ${client.remote_server}${client.assigned_port ? `:${client.assigned_port}` : ''}
+                    <strong>Remote:</strong> ${client.remote_server}${remotePortDisplay}
+                    ${client.secret ? '<br><strong>Auth:</strong> Enabled' : ''}
                 </div>
                 <div class="item-actions">
                     ${client.status === 'stopped' ?
@@ -43,7 +59,8 @@ window.clientsUI = {
                     <button class="btn-danger" onclick="clientsUI.deleteClient(${client.id})" ${client.status !== 'stopped' ? 'disabled' : ''}>Delete</button>
                 </div>
             </div>
-        `).join('');
+        `;
+        }).join('');
     },
 
     async startClient(id) {
@@ -77,18 +94,37 @@ window.clientsUI = {
         }
     },
 
-    showCreateDialog() {
-        const name = prompt('Client name:');
-        if (!name) return;
+    showCreateForm() {
+        const modal = document.getElementById('client-modal');
+        const form = document.getElementById('client-form');
 
-        const localPort = prompt('Local port:', '8080');
-        const remoteServer = prompt('Remote server:', 'localhost');
+        form.reset();
+        modal.classList.add('show');
 
-        this.createClient({
-            name,
-            description: '',
-            local_port: parseInt(localPort) || 8080,
-            remote_server: remoteServer || 'localhost',
+        // Remove old event listener and add new one
+        const newForm = form.cloneNode(true);
+        form.parentNode.replaceChild(newForm, form);
+
+        newForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const data = {
+                name: document.getElementById('client-name').value,
+                description: document.getElementById('client-description').value || '',
+                local_host: document.getElementById('client-local-host').value,
+                local_port: parseInt(document.getElementById('client-local-port').value),
+                remote_server: document.getElementById('client-remote-server').value,
+                remote_port: parseInt(document.getElementById('client-remote-port').value),
+                secret: document.getElementById('client-secret').value || null,
+                auto_start: document.getElementById('client-auto-start').checked,
+            };
+
+            try {
+                await this.createClient(data);
+                closeClientModal();
+            } catch (e) {
+                alert(`Failed to create client: ${e.message}`);
+            }
         });
     },
 
@@ -97,7 +133,7 @@ window.clientsUI = {
             await api.createClient(data);
             await this.loadClients();
         } catch (e) {
-            alert(`Failed to create client: ${e.message}`);
+            throw e;
         }
     }
 };

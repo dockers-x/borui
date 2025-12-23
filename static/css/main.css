@@ -371,3 +371,21 @@ body {
 .btn-logout:hover {
     background: #c0392b;
 }
+
+.badge {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border-radius: 4px;
+    background: #e8f4fd;
+    color: #2980b9;
+    margin-left: 0.25rem;
+}
+
+.form-help {
+    display: block;
+    font-size: 0.85rem;
+    color: #7f8c8d;
+    margin-top: 0.25rem;
+}

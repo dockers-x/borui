@@ -2,28 +2,34 @@ use axum::{
     extract::State,
     http::StatusCode,
     routing::{get, post},
-    Json, Router,
+    Json, Router, Extension,
 };
 use argon2::PasswordVerifier;
-use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
+use jsonwebtoken::{encode, EncodingKey, Header};
 use serde::{Deserialize, Serialize};
 
 use crate::db;
 use crate::error::{AppError, Result};
 use crate::models::{LoginRequest, LoginResponse, UserInfo};
 use crate::state::AppState;
+use crate::middleware::AuthUser;
 
 #[derive(Debug, Serialize, Deserialize)]
-struct Claims {
-    sub: i64, // user id
-    username: String,
-    exp: usize,
+pub struct Claims {
+    pub sub: i64, // user id
+    pub username: String,
+    pub exp: usize,
 }
 
 pub fn router() -> Router<AppState> {
     Router::new()
         .route("/login", post(login))
         .route("/logout", post(logout))
+}
+
+// Separate router for authenticated routes
+pub fn protected_router() -> Router<AppState> {
+    Router::new()
         .route("/me", get(me))
 }
 
@@ -80,27 +86,11 @@ async fn logout() -> Result<StatusCode> {
 }
 
 async fn me(
-    State(_state): State<AppState>,
+    Extension(user): Extension<AuthUser>,
 ) -> Result<Json<UserInfo>> {
-    // TODO: Extract user from JWT token in Authorization header
-    // For now, return a placeholder
+    // Extract user info from JWT token (provided by auth middleware)
     Ok(Json(UserInfo {
-        id: 1,
-        username: "admin".to_string(),
+        id: user.id,
+        username: user.username,
     }))
-}
-
-// Helper function to extract and validate JWT token
-#[allow(dead_code)]
-fn verify_token(token: &str) -> Result<Claims> {
-    let jwt_secret = std::env::var("JWT_SECRET")
-        .unwrap_or_else(|_| "change-me-in-production-this-is-not-secure".to_string());
-
-    let token_data = decode::<Claims>(
-        token,
-        &DecodingKey::from_secret(jwt_secret.as_bytes()),
-        &Validation::default(),
-    )?;
-
-    Ok(token_data.claims)
 }
