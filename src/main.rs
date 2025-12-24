@@ -79,7 +79,7 @@ async fn main() -> anyhow::Result<()> {
             password_hash::{PasswordHasher, SaltString},
             Argon2,
         };
-        use rand::rngs::OsRng;
+        use argon2::password_hash::rand_core::OsRng;
 
         let salt = SaltString::generate(&mut OsRng);
         let password_hash = Argon2::default()

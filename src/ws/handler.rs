@@ -1,7 +1,8 @@
 use axum::{
     extract::ws::{Message, WebSocket, WebSocketUpgrade},
-    extract::State,
+    extract::{State, Query},
     response::IntoResponse,
+    http::StatusCode,
 };
 use dashmap::DashMap;
 use futures_util::{SinkExt, StreamExt};
@@ -11,6 +12,7 @@ use tokio::sync::mpsc;
 use uuid::Uuid;
 
 use crate::state::AppState;
+use crate::middleware::verify_token;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type", content = "data")]
@@ -25,6 +27,11 @@ pub enum WsMessage {
     Error(serde_json::Value),
     #[serde(rename = "pong")]
     Pong,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct WsQuery {
+    token: Option<String>,
 }
 
 pub struct WsBroadcaster {
@@ -70,11 +77,27 @@ impl Default for WsBroadcaster {
 pub async fn ws_handler(
     ws: WebSocketUpgrade,
     State(state): State<AppState>,
-) -> impl IntoResponse {
-    ws.on_upgrade(|socket| handle_socket(socket, state))
+    Query(query): Query<WsQuery>,
+) -> Result<impl IntoResponse, StatusCode> {
+    // Verify JWT token from query parameter
+    if let Some(token) = query.token {
+        match verify_token(&token) {
+            Ok(claims) => {
+                tracing::debug!("WebSocket authenticated for user: {}", claims.username);
+                Ok(ws.on_upgrade(move |socket| handle_socket(socket, state, claims.username)))
+            }
+            Err(e) => {
+                tracing::warn!("WebSocket authentication failed: {}", e);
+                Err(StatusCode::UNAUTHORIZED)
+            }
+        }
+    } else {
+        tracing::warn!("WebSocket token missing");
+        Err(StatusCode::UNAUTHORIZED)
+    }
 }
 
-async fn handle_socket(socket: WebSocket, state: AppState) {
+async fn handle_socket(socket: WebSocket, state: AppState, username: String) {
     let (mut sender, mut receiver) = socket.split();
     let client_id = Uuid::new_v4();
 
@@ -82,7 +105,7 @@ async fn handle_socket(socket: WebSocket, state: AppState) {
 
     state.ws_broadcaster.add_client(client_id, tx);
 
-    tracing::info!("WebSocket client connected: {}", client_id);
+    tracing::info!("WebSocket client connected: {} (user: {})", client_id, username);
 
     let mut send_task = tokio::spawn(async move {
         while let Some(msg) = rx.recv().await {

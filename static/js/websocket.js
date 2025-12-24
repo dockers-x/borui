@@ -5,11 +5,19 @@ class WSClient {
         this.reconnectInterval = 5000;
         this.reconnectTimer = null;
         this.listeners = new Map();
+        this.token = localStorage.getItem('token');
     }
 
     connect() {
         const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const wsURL = `${protocol}//${window.location.host}/ws`;
+        const token = this.token || localStorage.getItem('token');
+
+        if (!token) {
+            console.warn('No token available for WebSocket connection');
+            return;
+        }
+
+        const wsURL = `${protocol}//${window.location.host}/ws?token=${encodeURIComponent(token)}`;
 
         this.ws = new WebSocket(wsURL);
 
@@ -40,6 +48,19 @@ class WSClient {
         this.ws.onerror = (error) => {
             console.error('WebSocket error', error);
         };
+    }
+
+    reconnectWithNewToken(newToken) {
+        console.log('Reconnecting WebSocket with new token...');
+        this.token = newToken;
+
+        // Close existing connection
+        if (this.ws) {
+            this.ws.close();
+        }
+
+        // Reconnect with new token
+        this.connect();
     }
 
     reconnect() {

@@ -102,12 +102,35 @@ body {
 }
 
 .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
     font-size: 1.5rem;
     font-weight: 700;
+    cursor: pointer;
+    transition: transform var(--transition-base);
+}
+
+.nav-brand:hover {
+    transform: scale(1.02);
+}
+
+.nav-brand span {
     background: linear-gradient(135deg, var(--primary), var(--secondary));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+}
+
+.nav-logo {
+    width: 48px;
+    height: 48px;
+    filter: drop-shadow(0 2px 8px rgba(151, 112, 201, 0.3));
+    transition: transform var(--transition-base);
+}
+
+.nav-brand:hover .nav-logo {
+    transform: rotate(-5deg) scale(1.05);
 }
 
 .nav-menu {

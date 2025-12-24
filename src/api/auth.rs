@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::db;
 use crate::error::{AppError, Result};
-use crate::models::{LoginRequest, LoginResponse, UserInfo, UpdateUsernameRequest, UpdateDisplayNameRequest, UpdatePasswordRequest};
+use crate::models::{LoginRequest, LoginResponse, TokenRefreshResponse, UserInfo, UpdateUsernameRequest, UpdateDisplayNameRequest, UpdatePasswordRequest};
 use crate::state::AppState;
 use crate::middleware::AuthUser;
 
@@ -31,6 +31,7 @@ pub fn router() -> Router<AppState> {
 pub fn protected_router() -> Router<AppState> {
     Router::new()
         .route("/me", get(me))
+        .route("/refresh", post(refresh_token))
         .route("/update-username", put(update_username))
         .route("/update-display-name", put(update_display_name))
         .route("/update-password", put(update_password))
@@ -101,6 +102,37 @@ async fn me(
         username: current_user.username,
         display_name: current_user.display_name,
     }))
+}
+
+async fn refresh_token(
+    State(state): State<AppState>,
+    Extension(user): Extension<AuthUser>,
+) -> Result<Json<TokenRefreshResponse>> {
+    // Get current user from database
+    let current_user = db::get_user_by_id(&state.db, user.id).await?;
+
+    // Generate new JWT token with fresh expiration
+    let expiration = chrono::Utc::now()
+        .checked_add_signed(chrono::Duration::hours(24))
+        .expect("valid timestamp")
+        .timestamp() as usize;
+
+    let claims = Claims {
+        sub: current_user.id,
+        username: current_user.username.clone(),
+        exp: expiration,
+    };
+
+    let jwt_secret = std::env::var("JWT_SECRET")
+        .unwrap_or_else(|_| "change-me-in-production-this-is-not-secure".to_string());
+
+    let token = encode(
+        &Header::default(),
+        &claims,
+        &EncodingKey::from_secret(jwt_secret.as_bytes()),
+    )?;
+
+    Ok(Json(TokenRefreshResponse { token }))
 }
 
 async fn update_username(

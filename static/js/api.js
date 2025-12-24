@@ -3,6 +3,89 @@ class API {
     constructor() {
         this.baseURL = '/api/v1';
         this.token = localStorage.getItem('token');
+        this.tokenRefreshTimer = null;
+
+        // Start token refresh timer if we have a token
+        if (this.token) {
+            this.scheduleTokenRefresh();
+        }
+    }
+
+    // Decode JWT token to get expiration time
+    decodeToken(token) {
+        try {
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+            return JSON.parse(jsonPayload);
+        } catch (e) {
+            console.error('Failed to decode token:', e);
+            return null;
+        }
+    }
+
+    // Schedule automatic token refresh
+    scheduleTokenRefresh() {
+        // Clear existing timer
+        if (this.tokenRefreshTimer) {
+            clearTimeout(this.tokenRefreshTimer);
+        }
+
+        const decoded = this.decodeToken(this.token);
+        if (!decoded || !decoded.exp) {
+            return;
+        }
+
+        const now = Math.floor(Date.now() / 1000);
+        const expiresIn = decoded.exp - now;
+
+        // Refresh token 5 minutes before expiration
+        const refreshIn = Math.max((expiresIn - 300) * 1000, 60000); // At least 1 minute
+
+        console.log(`Token will be refreshed in ${Math.floor(refreshIn / 1000)} seconds`);
+
+        this.tokenRefreshTimer = setTimeout(async () => {
+            try {
+                await this.refreshToken();
+            } catch (e) {
+                console.error('Failed to refresh token:', e);
+                // If refresh fails, redirect to login
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.href = '/login.html';
+            }
+        }, refreshIn);
+    }
+
+    // Refresh the JWT token
+    async refreshToken() {
+        console.log('Refreshing token...');
+        const response = await fetch(`${this.baseURL}/auth/refresh`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${this.token}`,
+            },
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            this.token = data.token;
+            localStorage.setItem('token', data.token);
+            console.log('Token refreshed successfully');
+
+            // Schedule next refresh
+            this.scheduleTokenRefresh();
+
+            // Notify WebSocket to reconnect with new token
+            if (window.wsClient) {
+                window.wsClient.reconnectWithNewToken(data.token);
+            }
+        } else {
+            throw new Error('Token refresh failed');
+        }
     }
 
     async request(endpoint, options = {}) {
@@ -22,6 +105,15 @@ class API {
         });
 
         if (!response.ok) {
+            // Handle authentication errors (401 Unauthorized)
+            if (response.status === 401) {
+                console.warn('Authentication failed - redirecting to login');
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.href = '/login.html';
+                return;
+            }
+
             const error = await response.json().catch(() => ({ error: 'Request failed' }));
             throw new Error(error.error || `HTTP ${response.status}`);
         }
