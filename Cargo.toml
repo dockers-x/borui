@@ -9,7 +9,7 @@ bore-cli = "0.6.0"
 
 # Web framework
 axum = { version = "0.7", features = ["macros", "ws"] }
-tower-http = { version = "0.5", features = ["fs", "trace", "cors"] }
+tower-http = { version = "0.6", features = ["fs", "trace", "cors"] }
 
 # Async runtime (aligned with bore-cli)
 tokio = { version = "1.17", features = ["full"] }
