@@ -28,9 +28,9 @@ window.clientsUI = {
             if (client.remote_port === 0) {
                 // Auto-assign mode
                 if (client.assigned_port) {
-                    remotePortDisplay = `:${client.assigned_port} <span class="badge">auto-assigned</span>`;
+                    remotePortDisplay = `:${client.assigned_port} <span class="badge" data-i18n="clients.autoAssigned">auto-assigned</span>`;
                 } else {
-                    remotePortDisplay = ' <span class="badge">auto-assign</span>';
+                    remotePortDisplay = ' <span class="badge" data-i18n="clients.autoAssign">auto-assign</span>';
                 }
             } else {
                 // User specified port

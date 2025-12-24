@@ -153,7 +153,15 @@ body {
     align-items: center;
 }
 
-.lang-select {
+/* Language Menu */
+.lang-menu {
+    position: relative;
+}
+
+.lang-menu-button {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
     padding: var(--space-xs) var(--space-sm);
     border: 2px solid var(--bg-tertiary);
     border-radius: var(--radius-md);
@@ -161,18 +169,72 @@ body {
     color: var(--text-primary);
     cursor: pointer;
     font-size: 0.875rem;
-    font-weight: 500;
+    font-weight: 600;
     transition: all var(--transition-fast);
 }
 
-.lang-select:hover {
-    border-color: var(--primary-light);
+.lang-menu-button .icon {
+    margin-right: 0;
+    margin-left: 0;
 }
 
-.lang-select:focus {
+.lang-menu-button:hover {
+    border-color: var(--primary-light);
+    background: var(--bg-tertiary);
+}
+
+.lang-menu-button:focus {
     outline: none;
     border-color: var(--primary);
     box-shadow: 0 0 0 3px rgba(151, 112, 201, 0.1);
+}
+
+.lang-menu-dropdown {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    min-width: 160px;
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    padding: var(--space-xs);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all var(--transition-fast);
+    z-index: 1000;
+}
+
+.lang-menu-dropdown.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.lang-menu-item {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: var(--space-sm) var(--space-md);
+    border: none;
+    background: transparent;
+    color: var(--text-primary);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.lang-menu-item:hover {
+    background: var(--bg-tertiary);
+}
+
+.lang-menu-item.active {
+    background: var(--bg-tertiary);
+    color: var(--primary);
+    font-weight: 600;
 }
 
 /* Container */

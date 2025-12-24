@@ -35,9 +35,9 @@ window.serversUI = {
                 <div class="item-details">
                     ${description}
                     <br>
-                    <strong>Address:</strong> ${server.bind_addr}
+                    <strong data-i18n="servers.address">Address</strong>: ${server.bind_addr}
                     <br>
-                    <strong>Port Range:</strong> ${server.port_range_start}-${server.port_range_end}
+                    <strong data-i18n="servers.portRange">Port Range</strong>: ${server.port_range_start}-${server.port_range_end}
                     ${authInfo}
                 </div>
                 <div class="item-actions">

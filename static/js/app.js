@@ -16,6 +16,7 @@
     document.getElementById('logout-icon').innerHTML = icons.logOut;
     document.getElementById('create-server-icon').innerHTML = icons.plus;
     document.getElementById('create-client-icon').innerHTML = icons.plus;
+    document.getElementById('globe-icon').innerHTML = icons.globe;
 
     // Initialize password toggle icons
     document.querySelectorAll('.password-toggle-icon').forEach(icon => {
@@ -32,6 +33,49 @@
         document.getElementById('user-display-name').textContent = 'User';
     }
 
+    // Setup language menu
+    const langMenuButton = document.getElementById('lang-menu-button');
+    const langMenuDropdown = document.getElementById('lang-menu-dropdown');
+    const currentLangCode = document.getElementById('current-lang-code');
+
+    // Update current language display
+    function updateLangDisplay(locale) {
+        const langMap = {
+            'en': 'EN',
+            'zh-CN': '简',
+            'zh-TW': '繁'
+        };
+        currentLangCode.textContent = langMap[locale] || 'EN';
+
+        // Update active state
+        document.querySelectorAll('.lang-menu-item').forEach(item => {
+            if (item.dataset.lang === locale) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
+    }
+
+    updateLangDisplay(i18n.locale);
+
+    langMenuButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        langMenuDropdown.classList.toggle('show');
+        userMenuDropdown.classList.remove('show');
+    });
+
+    langMenuDropdown.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const langItem = e.target.closest('.lang-menu-item');
+        if (langItem) {
+            const lang = langItem.dataset.lang;
+            await i18n.loadLocale(lang);
+            updateLangDisplay(lang);
+            langMenuDropdown.classList.remove('show');
+        }
+    });
+
     // Setup user menu
     const userMenuButton = document.getElementById('user-menu-button');
     const userMenuDropdown = document.getElementById('user-menu-dropdown');
@@ -39,11 +83,13 @@
     userMenuButton.addEventListener('click', (e) => {
         e.stopPropagation();
         userMenuDropdown.classList.toggle('show');
+        langMenuDropdown.classList.remove('show');
     });
 
-    // Close menu when clicking outside
+    // Close menus when clicking outside
     document.addEventListener('click', () => {
         userMenuDropdown.classList.remove('show');
+        langMenuDropdown.classList.remove('show');
     });
 
     // Handle menu item clicks - settings link and logout are handled here
@@ -56,13 +102,6 @@
             showView('settings');
             userMenuDropdown.classList.remove('show');
         }
-    });
-
-    // Setup language selector
-    const langSelector = document.getElementById('language-selector');
-    langSelector.value = i18n.locale;
-    langSelector.addEventListener('change', async (e) => {
-        await i18n.loadLocale(e.target.value);
     });
 
     // Setup navigation
