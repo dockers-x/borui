@@ -8,7 +8,7 @@ edition = "2024"
 bore-cli = "0.6.0"
 
 # Web framework
-axum = { version = "0.7", features = ["macros", "ws"] }
+axum = { version = "0.8", features = ["macros", "ws"] }
 tower-http = { version = "0.6", features = ["fs", "trace", "cors"] }
 
 # Async runtime (aligned with bore-cli)
