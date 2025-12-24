@@ -44,7 +44,7 @@ dotenvy = "0.15"
 # Authentication
 argon2 = "0.5"
 jsonwebtoken = "9.0"
-rand = "0.8"
+rand = "0.9"
 
 # Concurrent data structures
 dashmap = "6.1"
