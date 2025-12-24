@@ -43,7 +43,7 @@ dotenvy = "0.15"
 
 # Authentication
 argon2 = "0.5"
-jsonwebtoken = "9.0"
+jsonwebtoken = "10.2"
 rand = "0.9"
 
 # Concurrent data structures
