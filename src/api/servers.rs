@@ -108,10 +108,23 @@ async fn stop_server(
         return Ok(Json(server));
     }
 
-    // Stop the server using ServerManager
-    state.server_manager.stop_server(id).await?;
+    // Try to stop the server using ServerManager
+    match state.server_manager.stop_server(id).await {
+        Ok(_) => {
+            // Successfully stopped
+            tracing::info!("Server {} stopped successfully", id);
+        }
+        Err(e) => {
+            // If server not found in manager, it's already stopped (e.g., after restart)
+            // Just log and continue to update database status
+            tracing::warn!(
+                "Server {} not found in ServerManager ({}), assuming already stopped. Syncing database.",
+                id, e
+            );
+        }
+    }
 
-    // Update status
+    // Update status regardless of ServerManager result
     db::update_server_status(&state.db, id, ServerStatus::Stopped, None).await?;
     server.status = ServerStatus::Stopped;
 

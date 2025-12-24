@@ -109,20 +109,40 @@ impl ServerManager {
     }
 
     pub fn get_status(&self, id: i64) -> Option<ServerStatusInfo> {
-        self.servers.get(&id).map(|entry| {
-            let uptime = entry
-                .started_at
-                .elapsed()
-                .unwrap_or(Duration::from_secs(0))
-                .as_secs();
+        self.servers.get(&id).and_then(|entry| {
+            // Check if task is still running
+            if entry.handle.is_finished() {
+                // Task has finished, return None to indicate it's not running
+                None
+            } else {
+                let uptime = entry
+                    .started_at
+                    .elapsed()
+                    .unwrap_or(Duration::from_secs(0))
+                    .as_secs();
 
-            ServerStatusInfo {
-                id,
-                status: "running".to_string(),
-                active_connections: 0, // TODO: Track actual connections
-                uptime_seconds: uptime,
+                Some(ServerStatusInfo {
+                    id,
+                    status: "running".to_string(),
+                    active_connections: 0, // TODO: Track actual connections
+                    uptime_seconds: uptime,
+                })
             }
         })
+    }
+
+    /// Check all running servers and return IDs of servers whose tasks have finished
+    pub fn get_finished_servers(&self) -> Vec<i64> {
+        self.servers
+            .iter()
+            .filter(|entry| entry.handle.is_finished())
+            .map(|entry| *entry.key())
+            .collect()
+    }
+
+    /// Remove a server from the manager without stopping it (for cleanup of finished tasks)
+    pub fn remove_finished_server(&self, id: i64) -> Option<()> {
+        self.servers.remove(&id).map(|_| ())
     }
 }
 

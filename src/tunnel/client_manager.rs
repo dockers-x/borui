@@ -130,20 +130,40 @@ impl ClientManager {
     }
 
     pub fn get_status(&self, id: i64) -> Option<ClientStatusInfo> {
-        self.clients.get(&id).map(|entry| {
-            let uptime = entry
-                .started_at
-                .elapsed()
-                .unwrap_or(Duration::from_secs(0))
-                .as_secs();
+        self.clients.get(&id).and_then(|entry| {
+            // Check if task is still running
+            if entry.handle.is_finished() {
+                // Task has finished, return None to indicate it's not running
+                None
+            } else {
+                let uptime = entry
+                    .started_at
+                    .elapsed()
+                    .unwrap_or(Duration::from_secs(0))
+                    .as_secs();
 
-            ClientStatusInfo {
-                id,
-                status: "connected".to_string(),
-                assigned_port: Some(entry.assigned_port),
-                uptime_seconds: uptime,
+                Some(ClientStatusInfo {
+                    id,
+                    status: "connected".to_string(),
+                    assigned_port: Some(entry.assigned_port),
+                    uptime_seconds: uptime,
+                })
             }
         })
+    }
+
+    /// Check all running clients and return IDs of clients whose tasks have finished
+    pub fn get_finished_clients(&self) -> Vec<i64> {
+        self.clients
+            .iter()
+            .filter(|entry| entry.handle.is_finished())
+            .map(|entry| *entry.key())
+            .collect()
+    }
+
+    /// Remove a client from the manager without stopping it (for cleanup of finished tasks)
+    pub fn remove_finished_client(&self, id: i64) -> Option<()> {
+        self.clients.remove(&id).map(|_| ())
     }
 }
 

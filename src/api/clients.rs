@@ -115,10 +115,23 @@ async fn stop_client(
         return Ok(Json(client));
     }
 
-    // Stop the client using ClientManager
-    state.client_manager.stop_client(id).await?;
+    // Try to stop the client using ClientManager
+    match state.client_manager.stop_client(id).await {
+        Ok(_) => {
+            // Successfully stopped
+            tracing::info!("Client {} stopped successfully", id);
+        }
+        Err(e) => {
+            // If client not found in manager, it's already stopped (e.g., after restart)
+            // Just log and continue to update database status
+            tracing::warn!(
+                "Client {} not found in ClientManager ({}), assuming already stopped. Syncing database.",
+                id, e
+            );
+        }
+    }
 
-    // Update status
+    // Update status regardless of ClientManager result
     db::update_client_status(&state.db, id, ClientStatus::Stopped, None, None).await?;
     client.status = ClientStatus::Stopped;
     client.assigned_port = None;

@@ -102,6 +102,12 @@ async fn main() -> anyhow::Result<()> {
     // Create application state
     let state = AppState::new(db);
 
+    // Sync database state with actual runtime state (handles restart scenarios)
+    sync_database_state(&state).await?;
+
+    // Start background task monitor to detect crashed/finished servers and clients
+    start_task_monitor(state.clone());
+
     // Start auto-start servers and clients
     start_auto_start_entities(&state).await?;
 
@@ -163,6 +169,116 @@ async fn shutdown_signal() {
             tracing::info!("Received SIGTERM, shutting down...");
         },
     }
+}
+
+// Start background task monitor to detect and cleanup finished tasks
+fn start_task_monitor(state: AppState) {
+    tokio::spawn(async move {
+        let mut interval = tokio::time::interval(Duration::from_secs(5));
+
+        loop {
+            interval.tick().await;
+
+            // Check for finished servers
+            let finished_servers = state.server_manager.get_finished_servers();
+            for server_id in finished_servers {
+                tracing::warn!(
+                    "Server {} task has finished unexpectedly. Cleaning up and updating database.",
+                    server_id
+                );
+
+                // Remove from manager
+                state.server_manager.remove_finished_server(server_id);
+
+                // Update database status
+                if let Err(e) = db::update_server_status(
+                    &state.db,
+                    server_id,
+                    models::ServerStatus::Error,
+                    Some("Server task stopped unexpectedly".to_string())
+                ).await {
+                    tracing::error!("Failed to update server {} status in database: {}", server_id, e);
+                }
+            }
+
+            // Check for finished clients
+            let finished_clients = state.client_manager.get_finished_clients();
+            for client_id in finished_clients {
+                tracing::warn!(
+                    "Client {} task has finished unexpectedly. Cleaning up and updating database.",
+                    client_id
+                );
+
+                // Remove from manager
+                state.client_manager.remove_finished_client(client_id);
+
+                // Update database status
+                if let Err(e) = db::update_client_status(
+                    &state.db,
+                    client_id,
+                    models::ClientStatus::Error,
+                    None,
+                    Some("Client task stopped unexpectedly".to_string())
+                ).await {
+                    tracing::error!("Failed to update client {} status in database: {}", client_id, e);
+                }
+            }
+        }
+    });
+
+    tracing::info!("Task monitor started (checking every 5 seconds)");
+}
+
+// Synchronize database state with actual runtime state
+// This handles cases where the application restarted and memory state was lost
+async fn sync_database_state(state: &AppState) -> anyhow::Result<()> {
+    tracing::info!("Synchronizing database state with runtime state...");
+
+    // Reset all servers that are marked as running/starting but aren't actually running
+    let servers = db::list_servers(&state.db).await?;
+    for server in servers {
+        if server.status == models::ServerStatus::Running
+            || server.status == models::ServerStatus::Starting {
+            // Check if server is actually running in memory
+            if state.server_manager.get_status(server.id).is_none() {
+                tracing::warn!(
+                    "Server '{}' (id: {}) marked as {:?} but not running. Resetting to stopped.",
+                    server.name, server.id, server.status
+                );
+                db::update_server_status(
+                    &state.db,
+                    server.id,
+                    models::ServerStatus::Stopped,
+                    Some("Reset after application restart".to_string())
+                ).await?;
+            }
+        }
+    }
+
+    // Reset all clients that are marked as connected/starting but aren't actually connected
+    let clients = db::list_clients(&state.db).await?;
+    for client in clients {
+        if client.status == models::ClientStatus::Connected
+            || client.status == models::ClientStatus::Starting {
+            // Check if client is actually connected in memory
+            if state.client_manager.get_status(client.id).is_none() {
+                tracing::warn!(
+                    "Client '{}' (id: {}) marked as {:?} but not connected. Resetting to stopped.",
+                    client.name, client.id, client.status
+                );
+                db::update_client_status(
+                    &state.db,
+                    client.id,
+                    models::ClientStatus::Stopped,
+                    None,
+                    Some("Reset after application restart".to_string())
+                ).await?;
+            }
+        }
+    }
+
+    tracing::info!("Database state synchronization completed");
+    Ok(())
 }
 
 // Start all servers and clients marked with auto_start
