@@ -331,7 +331,7 @@ dependencies = [
  "signal-hook",
  "signal-hook-tokio",
  "sqlx",
- "thiserror 1.0.69",
+ "thiserror 2.0.17",
  "tokio",
  "tower-http",
  "tracing",
