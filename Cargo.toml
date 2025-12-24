@@ -47,7 +47,7 @@ jsonwebtoken = "9.0"
 rand = "0.8"
 
 # Concurrent data structures
-dashmap = "5.5"
+dashmap = "6.1"
 
 [target.'cfg(unix)'.dependencies]
 # Graceful shutdown (Unix only)
