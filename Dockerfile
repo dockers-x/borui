@@ -1,7 +1,7 @@
 # Multi-stage build for smaller image with dependency caching
 
 # Stage 1: Prepare recipe for dependency caching
-FROM rust:1.92-slim AS chef
+FROM rust:1.92-bookworm-slim AS chef
 RUN cargo install cargo-chef
 WORKDIR /app
 
