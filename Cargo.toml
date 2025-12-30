@@ -1,18 +1,18 @@
 [package]
 name = "borui"
-version = "0.1.6"
+version = "0.1.7"
 edition = "2024"
 
 [dependencies]
 # Core bore functionality
-bore-cli = "0.6.1"
+bore-cli = "0.6.0"
 
 # Web framework
 axum = { version = "0.8", features = ["macros", "ws"] }
 tower-http = { version = "0.6", features = ["fs", "trace", "cors"] }
 
 # Async runtime (aligned with bore-cli)
-tokio = { version = "1.17", features = ["full"] }
+tokio = { version = "1", features = ["full"] }
 futures-util = "0.3"
 
 # Database
