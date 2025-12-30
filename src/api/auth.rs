@@ -4,7 +4,8 @@ use axum::{
     routing::{get, post, put},
     Json, Router, Extension,
 };
-use argon2::{PasswordVerifier, PasswordHasher, password_hash::{rand_core::OsRng, SaltString}};
+use argon2::{PasswordVerifier, PasswordHasher, password_hash::SaltString};
+use rand_core::OsRng;
 use jsonwebtoken::{encode, EncodingKey, Header};
 use serde::{Deserialize, Serialize};
 

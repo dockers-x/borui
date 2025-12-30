@@ -13,10 +13,10 @@ use crate::state::AppState;
 pub fn router() -> Router<AppState> {
     Router::new()
         .route("/", get(list_servers).post(create_server))
-        .route("/:id", get(get_server).put(update_server).delete(delete_server))
-        .route("/:id/start", post(start_server))
-        .route("/:id/stop", post(stop_server))
-        .route("/:id/status", get(get_server_status))
+        .route("/{id}", get(get_server).put(update_server).delete(delete_server))
+        .route("/{id}/start", post(start_server))
+        .route("/{id}/stop", post(stop_server))
+        .route("/{id}/status", get(get_server_status))
 }
 
 async fn list_servers(

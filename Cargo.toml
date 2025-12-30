@@ -5,7 +5,7 @@ edition = "2024"
 
 [dependencies]
 # Core bore functionality
-bore-cli = "0.6.0"
+bore-cli = "0.6.1"
 
 # Web framework
 axum = { version = "0.8", features = ["macros", "ws"] }
@@ -43,8 +43,8 @@ dotenvy = "0.15"
 
 # Authentication
 argon2 = "0.5"
-jsonwebtoken = "10.2"
-rand = "0.9"
+jsonwebtoken = { version = "10.2", default-features = false, features = ["aws_lc_rs"] }
+rand_core = { version = "0.6", features = ["std"] }
 
 # Concurrent data structures
 dashmap = "6.1"
