@@ -1,7 +1,7 @@
 # Multi-stage build for smaller image with dependency caching
 
 # Stage 1: Prepare recipe for dependency caching
-FROM rust:1.92-bookworm-slim AS chef
+FROM rust:1.92.0-slim-bookworm AS chef
 RUN cargo install cargo-chef
 WORKDIR /app
 
@@ -30,7 +30,7 @@ COPY . .
 RUN cargo build --release
 
 # Stage 4: Runtime stage - use minimal base image
-FROM debian:bookworm-slim
+FROM debian:trixie-slim
 
 # Install runtime dependencies
 RUN apt-get update && apt-get install -y \
