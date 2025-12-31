@@ -314,7 +314,7 @@ dependencies = [
  "futures-util",
  "jsonwebtoken",
  "mime_guess",
- "rand_core 0.6.4",
+ "rand_core 0.9.3",
  "rust-embed",
  "serde",
  "serde_json",
