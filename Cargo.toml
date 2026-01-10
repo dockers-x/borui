@@ -60,5 +60,5 @@ handlebars = "6.2"
 
 [target.'cfg(unix)'.dependencies]
 # Graceful shutdown (Unix only)
-signal-hook = "0.3"
+signal-hook = "0.4"
 signal-hook-tokio = { version = "0.4", features = ["futures-v0_3"] }
