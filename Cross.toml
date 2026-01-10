@@ -1,0 +1,29 @@
+# Cross-compilation configuration for borui
+# This file configures the cross tool to build for multiple architectures
+
+[build]
+# Use offline mode for sqlx
+[build.env]
+passthrough = [
+    "SQLX_OFFLINE"
+]
+
+# x86_64 Linux (musl for static linking)
+[target.x86_64-unknown-linux-musl]
+image = "ghcr.io/cross-rs/x86_64-unknown-linux-musl:latest"
+
+# ARM64/aarch64 Linux
+[target.aarch64-unknown-linux-musl]
+image = "ghcr.io/cross-rs/aarch64-unknown-linux-musl:latest"
+
+# ARM Linux (soft float)
+[target.arm-unknown-linux-musleabi]
+image = "ghcr.io/cross-rs/arm-unknown-linux-musleabi:latest"
+
+# ARM Linux (hard float)
+[target.arm-unknown-linux-musleabihf]
+image = "ghcr.io/cross-rs/arm-unknown-linux-musleabihf:latest"
+
+# ARMv7 Linux (hard float)
+[target.armv7-unknown-linux-musleabihf]
+image = "ghcr.io/cross-rs/armv7-unknown-linux-musleabihf:latest"

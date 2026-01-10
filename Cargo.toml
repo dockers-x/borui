@@ -49,8 +49,8 @@ rand_core = { version = "0.6", features = ["std"] }
 # Concurrent data structures
 dashmap = "6.1"
 
-# HTTP client for webhooks
-reqwest = { version = "0.12", features = ["json"] }
+# HTTP client for webhooks (use rustls to avoid OpenSSL dependency in cross-compilation)
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
 
 # URL parsing for webhook validation
 url = "2.5"
