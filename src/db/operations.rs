@@ -243,8 +243,8 @@ pub async fn get_client(pool: &SqlitePool, id: i64) -> Result<Client> {
 pub async fn create_client(pool: &SqlitePool, input: CreateClient) -> Result<Client> {
     let client = sqlx::query_as::<_, Client>(
         r#"
-        INSERT INTO clients (name, description, local_host, local_port, remote_server, remote_port, secret, auto_start)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO clients (name, description, local_host, local_port, remote_server, remote_port, secret, auto_start, webhook_url, webhook_format, webhook_template)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         RETURNING *
         "#
     )
@@ -256,6 +256,9 @@ pub async fn create_client(pool: &SqlitePool, input: CreateClient) -> Result<Cli
     .bind(input.remote_port)
     .bind(&input.secret)
     .bind(input.auto_start)
+    .bind(&input.webhook_url)
+    .bind(&input.webhook_format)
+    .bind(&input.webhook_template)
     .fetch_one(pool)
     .await?;
 
@@ -298,6 +301,18 @@ pub async fn update_client(pool: &SqlitePool, id: i64, input: UpdateClient) -> R
     }
     if let Some(auto) = input.auto_start {
         query.push_str(&format!(", auto_start = {}", if auto { 1 } else { 0 }));
+    }
+    if let Some(webhook_url) = &input.webhook_url {
+        query.push_str(", webhook_url = ?");
+        params.push(webhook_url.clone());
+    }
+    if let Some(webhook_format) = &input.webhook_format {
+        query.push_str(", webhook_format = ?");
+        params.push(webhook_format.clone());
+    }
+    if let Some(webhook_template) = &input.webhook_template {
+        query.push_str(", webhook_template = ?");
+        params.push(webhook_template.clone());
     }
 
     query.push_str(" WHERE id = ?");

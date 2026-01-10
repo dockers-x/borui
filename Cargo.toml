@@ -49,6 +49,15 @@ rand_core = { version = "0.6", features = ["std"] }
 # Concurrent data structures
 dashmap = "6.1"
 
+# HTTP client for webhooks
+reqwest = { version = "0.12", features = ["json"] }
+
+# URL parsing for webhook validation
+url = "2.5"
+
+# Template rendering
+handlebars = "6.2"
+
 [target.'cfg(unix)'.dependencies]
 # Graceful shutdown (Unix only)
 signal-hook = "0.3"

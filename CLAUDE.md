@@ -37,6 +37,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Features
 - Server included: Users can setup own server with options in web UI
 - Multi-client support and management in web UI, users can connect to multiple servers
+- **Webhook Integration**: Automatic notifications when clients connect/disconnect with customizable formats
+  - Standard JSON format for easy integration
+  - Custom template support using Handlebars for flexible payload formatting
+  - Fire-and-forget with automatic retry logic
 - Modern web UI embedded in the binary
 - Modern CSS for better UI appearance
 - Multi-language support: Chinese, English, Traditional Chinese

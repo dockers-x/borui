@@ -14,6 +14,9 @@ pub struct Client {
     pub secret: Option<String>,
     pub status: ClientStatus,
     pub auto_start: bool,
+    pub webhook_url: Option<String>,
+    pub webhook_format: String,
+    pub webhook_template: Option<String>,
     pub created_at: String,
     pub updated_at: String,
     pub last_connected_at: Option<String>,
@@ -43,6 +46,10 @@ pub struct CreateClient {
     pub secret: Option<String>,
     #[serde(default)]
     pub auto_start: bool,
+    pub webhook_url: Option<String>,
+    #[serde(default = "default_webhook_format")]
+    pub webhook_format: String,
+    pub webhook_template: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -55,8 +62,15 @@ pub struct UpdateClient {
     pub remote_port: Option<i64>,
     pub secret: Option<String>,
     pub auto_start: Option<bool>,
+    pub webhook_url: Option<String>,
+    pub webhook_format: Option<String>,
+    pub webhook_template: Option<String>,
 }
 
 fn default_local_host() -> String {
     "localhost".to_string()
+}
+
+fn default_webhook_format() -> String {
+    "json".to_string()
 }

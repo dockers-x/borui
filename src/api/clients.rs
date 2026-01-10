@@ -9,6 +9,7 @@ use crate::db;
 use crate::error::Result;
 use crate::models::{Client, ClientStatus, CreateClient, UpdateClient};
 use crate::state::AppState;
+use crate::webhook::{WebhookEvent, send_webhook};
 
 pub fn router() -> Router<AppState> {
     Router::new()
@@ -95,6 +96,17 @@ async fn start_client(
             ).await?;
             client.status = ClientStatus::Connected;
             client.assigned_port = Some(assigned_port as i64);
+
+            // Send webhook for connected event
+            if let Some(webhook_url) = &client.webhook_url {
+                send_webhook(
+                    webhook_url.clone(),
+                    WebhookEvent::Connected,
+                    client.clone(),
+                    serde_json::json!({}),
+                );
+            }
+
             Ok(Json(client))
         }
         Err(e) => {
@@ -114,6 +126,11 @@ async fn stop_client(
     if client.status == ClientStatus::Stopped {
         return Ok(Json(client));
     }
+
+    // Get uptime before stopping
+    let uptime_seconds = state.client_manager.get_status(id)
+        .map(|status| status.uptime_seconds)
+        .unwrap_or(0);
 
     // Try to stop the client using ClientManager
     match state.client_manager.stop_client(id).await {
@@ -135,6 +152,18 @@ async fn stop_client(
     db::update_client_status(&state.db, id, ClientStatus::Stopped, None, None).await?;
     client.status = ClientStatus::Stopped;
     client.assigned_port = None;
+
+    // Send webhook for disconnected event
+    if let Some(webhook_url) = &client.webhook_url {
+        send_webhook(
+            webhook_url.clone(),
+            WebhookEvent::Disconnected,
+            client.clone(),
+            serde_json::json!({
+                "uptime_seconds": uptime_seconds
+            }),
+        );
+    }
 
     Ok(Json(client))
 }

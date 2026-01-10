@@ -232,55 +232,195 @@
                 <span class="close" onclick="closeClientModal()">&times;</span>
             </div>
             <form id="client-form">
-                <div class="form-group">
-                    <label for="client-name"><span data-i18n="clients.name">Name</span> <span data-i18n="common.required">*</span></label>
-                    <input type="text" id="client-name" required>
-                </div>
-                <div class="form-group">
-                    <label for="client-description" data-i18n="clients.description">Description</label>
-                    <input type="text" id="client-description">
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="client-local-host" data-i18n="clients.localHost">Local Host</label>
-                        <input type="text" id="client-local-host" value="localhost">
+                <div class="modal-body">
+                    <!-- Tab Navigation -->
+                    <div class="modal-tabs">
+                        <button type="button" class="modal-tab active" onclick="switchTab(event, 'tab-basic')" data-i18n="clients.tabBasic">基础设置</button>
+                        <button type="button" class="modal-tab" onclick="switchTab(event, 'tab-advanced')" data-i18n="clients.tabAdvanced">高级配置</button>
+                        <button type="button" class="modal-tab" onclick="switchTab(event, 'tab-webhook')" data-i18n="clients.tabWebhook">Webhook</button>
                     </div>
-                    <div class="form-group">
-                        <label for="client-local-port"><span data-i18n="clients.localPort">Local Port</span> <span data-i18n="common.required">*</span></label>
-                        <input type="number" id="client-local-port" required min="1" max="65535">
+
+                    <!-- Tab Panels -->
+                    <div class="modal-tab-panels">
+                        <!-- Tab 1: Basic Settings -->
+                        <div id="tab-basic" class="modal-tab-panel active">
+                            <div class="form-section">
+                                <div class="form-group">
+                                    <label for="client-name"><span data-i18n="clients.name">Name</span> <span data-i18n="common.required">*</span></label>
+                                    <input type="text" id="client-name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="client-description" data-i18n="clients.description">Description</label>
+                                    <input type="text" id="client-description">
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="client-local-host" data-i18n="clients.localHost">Local Host</label>
+                                        <input type="text" id="client-local-host" value="localhost">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="client-local-port"><span data-i18n="clients.localPort">Local Port</span> <span data-i18n="common.required">*</span></label>
+                                        <input type="number" id="client-local-port" required min="1" max="65535">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="client-remote-server"><span data-i18n="clients.remoteServer">Remote Server</span> <span data-i18n="common.required">*</span></label>
+                                        <input type="text" id="client-remote-server" required placeholder="example.com">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="client-remote-port" data-i18n="clients.remotePort">Remote Port</label>
+                                        <input type="number" id="client-remote-port" value="0" min="0" max="65535">
+                                        <small class="form-help" data-i18n="clients.remotePortHelp">0 = auto-assign</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tab 2: Advanced Configuration -->
+                        <div id="tab-advanced" class="modal-tab-panel">
+                            <div class="form-section">
+                                <div class="form-group">
+                                    <label for="client-secret" data-i18n="clients.secret">Secret (Optional)</label>
+                                    <div class="password-input-wrapper">
+                                        <input type="password" id="client-secret" class="password-input">
+                                        <button type="button" class="password-toggle" onclick="togglePasswordVisibility('client-secret')" aria-label="Toggle password visibility">
+                                            <span class="password-toggle-icon"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>
+                                        <input type="checkbox" id="client-auto-start">
+                                        <span data-i18n="clients.autoStart">Auto-start on application boot</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tab 3: Webhook Configuration -->
+                        <div id="tab-webhook" class="modal-tab-panel">
+                            <div class="webhook-section" id="webhook-section">
+                                <div class="webhook-header">
+                                    <div class="webhook-title-group">
+                                        <h3>
+                                            <span data-i18n="clients.webhook">Webhook</span>
+                                            <span class="webhook-status-indicator status-disabled" id="webhook-status-badge">
+                                                <span data-i18n="clients.webhookDisabled">Off</span>
+                                            </span>
+                                        </h3>
+                                    </div>
+                                    <div class="webhook-toggle-wrapper">
+                                        <label class="webhook-toggle">
+                                            <input type="checkbox" id="webhook-enabled" onchange="toggleWebhookSection()">
+                                            <span class="webhook-toggle-slider"></span>
+                                        </label>
+                                        <button type="button" class="btn-link" onclick="showWebhookHelp()">
+                                            <span data-i18n="clients.webhookHelp">📖 Guide</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="webhook-config" id="webhook-config">
+                                    <div class="form-group">
+                                        <label for="client-webhook-url" data-i18n="clients.webhookUrl">Webhook URL</label>
+                                        <input type="url" id="client-webhook-url" data-i18n-placeholder="clients.webhookUrlPlaceholder" placeholder="https://your-webhook.example.com/hook">
+                                        <span class="form-help" data-i18n="clients.webhookUrlHelp">Endpoint URL for notifications</span>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="client-webhook-format" data-i18n="clients.webhookFormat">Format</label>
+                                        <select id="client-webhook-format" onchange="toggleWebhookTemplate()">
+                                            <option value="json" data-i18n="clients.webhookFormatJson">Standard JSON</option>
+                                            <option value="custom" data-i18n="clients.webhookFormatCustom">Custom Template</option>
+                                        </select>
+                                        <div class="webhook-format-indicator" id="webhook-format-info">
+                                            <span data-i18n="clients.webhookFormatInfo">Structured JSON for integrations</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group hidden" id="webhook-template-group">
+                                        <div class="webhook-preset-group">
+                                            <div class="form-group">
+                                                <label for="webhook-template-preset" data-i18n="clients.webhookPreset">Presets</label>
+                                                <select id="webhook-template-preset" onchange="applyWebhookPreset()">
+                                                    <option value="" data-i18n="clients.webhookPresetCustom">Custom...</option>
+                                                    <option value="slack" data-i18n="clients.webhookPresetSlack">Slack</option>
+                                                    <option value="discord" data-i18n="clients.webhookPresetDiscord">Discord</option>
+                                                    <option value="simple" data-i18n="clients.webhookPresetSimple">Simple Text</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <label for="client-webhook-template" data-i18n="clients.webhookTemplate">Template (Handlebars)</label>
+                                        <textarea id="client-webhook-template" rows="5" data-i18n-placeholder="clients.webhookTemplatePlaceholder" placeholder="Client {{client_name}} {{event}} at {{timestamp}}"></textarea>
+                                        <span class="form-help" data-i18n="clients.webhookTemplateHelp">Use Handlebars syntax</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="client-remote-server"><span data-i18n="clients.remoteServer">Remote Server</span> <span data-i18n="common.required">*</span></label>
-                        <input type="text" id="client-remote-server" required placeholder="example.com">
-                    </div>
-                    <div class="form-group">
-                        <label for="client-remote-port" data-i18n="clients.remotePort">Remote Port</label>
-                        <input type="number" id="client-remote-port" value="0" min="0" max="65535">
-                        <small class="form-help" data-i18n="clients.remotePortHelp">0 = auto-assign, or specify a port number</small>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="client-secret" data-i18n="clients.secret">Secret (Optional)</label>
-                    <div class="password-input-wrapper">
-                        <input type="password" id="client-secret" class="password-input">
-                        <button type="button" class="password-toggle" onclick="togglePasswordVisibility('client-secret')" aria-label="Toggle password visibility">
-                            <span class="password-toggle-icon"></span>
-                        </button>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>
-                        <input type="checkbox" id="client-auto-start">
-                        <span data-i18n="clients.autoStart">Auto-start on application boot</span>
-                    </label>
-                </div>
+
                 <div class="modal-footer">
                     <button type="button" class="btn-secondary" onclick="closeClientModal()" data-i18n="common.cancel">Cancel</button>
                     <button type="submit" class="btn-primary" data-i18n="common.create">Create</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Webhook Help Modal -->
+    <div id="webhook-help-modal" class="modal webhook-help-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 data-i18n="webhookHelp.title">Webhook Integration Guide</h2>
+                <span class="close" onclick="closeWebhookHelp()">&times;</span>
+            </div>
+            <div class="webhook-help-content">
+                <p data-i18n="webhookHelp.intro">Webhooks allow automatic notifications when client status changes.</p>
+
+                <h3 data-i18n="webhookHelp.events">Webhook Events</h3>
+                <ul>
+                    <li><code>client.connected</code> <span data-i18n="webhookHelp.eventConnectedDesc">- Triggered when client successfully connects</span></li>
+                    <li><code>client.disconnected</code> <span data-i18n="webhookHelp.eventDisconnectedDesc">- Triggered when client disconnects/stops</span></li>
+                </ul>
+
+                <h3 data-i18n="webhookHelp.formats">Webhook Formats</h3>
+                <h4 data-i18n="webhookHelp.formatJson">Standard JSON Format</h4>
+                <p data-i18n="webhookHelp.formatJsonDesc">Sends structured JSON payload with predefined fields.</p>
+                <pre><code>{
+  "event": "client.connected",
+  "timestamp": "2025-01-10T12:00:00Z",
+  "client_id": 1,
+  "client_name": "my-client",
+  "local_host": "localhost",
+  "local_port": 8080,
+  "remote_server": "example.com:7835",
+  "assigned_port": 12345,
+  "description": "My test client"
+}</code></pre>
+
+                <h4 data-i18n="webhookHelp.formatCustom">Custom Template Format</h4>
+                <p data-i18n="webhookHelp.formatCustomDesc">Use Handlebars templates to customize the payload format.</p>
+                <pre><code>Client {{client_name}} (ID: {{client_id}}) {{event}} at {{timestamp}}
+{{#if assigned_port}}Assigned Port: {{assigned_port}}{{/if}}</code></pre>
+
+                <h3 data-i18n="webhookHelp.variables">Available Template Variables</h3>
+                <ul>
+                    <li><strong data-i18n="webhookHelp.variablesCommonTitle">Common (all events):</strong> <code>{{event}}</code>, <code>{{timestamp}}</code>, <code>{{client_id}}</code>, <code>{{client_name}}</code>, <code>{{description}}</code></li>
+                    <li><strong data-i18n="webhookHelp.variablesConnectedTitle">Connected event:</strong> <code>{{local_host}}</code>, <code>{{local_port}}</code>, <code>{{remote_server}}</code>, <code>{{assigned_port}}</code></li>
+                    <li><strong data-i18n="webhookHelp.variablesDisconnectedTitle">Disconnected event:</strong> <code>{{uptime_seconds}}</code></li>
+                </ul>
+
+                <h3 data-i18n="webhookHelp.testing">Testing Webhooks</h3>
+                <p data-i18n="webhookHelp.testingDesc">Use <code>webhook.site</code> or <code>requestbin.com</code> to get a temporary URL for testing.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-primary" onclick="closeWebhookHelp()" data-i18n="webhookHelp.close">Close</button>
+            </div>
         </div>
     </div>
 

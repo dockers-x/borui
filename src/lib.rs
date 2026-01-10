@@ -8,6 +8,7 @@ pub mod api;
 pub mod ws;
 pub mod web;
 pub mod middleware;
+pub mod webhook;
 
 pub use config::Config;
 pub use error::AppError;

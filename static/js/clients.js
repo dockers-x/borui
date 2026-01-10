@@ -146,9 +146,34 @@ window.clientsUI = {
             document.getElementById('client-remote-port').value = client.remote_port;
             document.getElementById('client-secret').value = client.secret || '';
             document.getElementById('client-auto-start').checked = client.auto_start || false;
+
+            // Set webhook fields
+            const webhookEnabled = !!client.webhook_url;
+            document.getElementById('webhook-enabled').checked = webhookEnabled;
+            document.getElementById('client-webhook-url').value = client.webhook_url || '';
+            document.getElementById('client-webhook-format').value = client.webhook_format || 'json';
+            document.getElementById('client-webhook-template').value = client.webhook_template || '';
+
+            // Update webhook UI state
+            toggleWebhookSection();
+            toggleWebhookTemplate();
+        } else {
+            // Default state for new clients - webhook disabled
+            document.getElementById('webhook-enabled').checked = false;
+            toggleWebhookSection();
         }
 
         modal.classList.add('show');
+
+        // Reset to first tab
+        document.querySelectorAll('.modal-tab').forEach((tab, index) => {
+            if (index === 0) tab.classList.add('active');
+            else tab.classList.remove('active');
+        });
+        document.querySelectorAll('.modal-tab-panel').forEach((panel, index) => {
+            if (index === 0) panel.classList.add('active');
+            else panel.classList.remove('active');
+        });
 
         // Remove old event listener and add new one
         const newForm = form.cloneNode(true);
@@ -156,6 +181,10 @@ window.clientsUI = {
 
         newForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+
+            // Get webhook URL only if enabled
+            const webhookEnabled = document.getElementById('webhook-enabled').checked;
+            const webhookUrl = webhookEnabled ? document.getElementById('client-webhook-url').value : null;
 
             const data = {
                 name: document.getElementById('client-name').value,
@@ -166,6 +195,9 @@ window.clientsUI = {
                 remote_port: parseInt(document.getElementById('client-remote-port').value),
                 secret: document.getElementById('client-secret').value || null,
                 auto_start: document.getElementById('client-auto-start').checked,
+                webhook_url: webhookUrl,
+                webhook_format: document.getElementById('client-webhook-format').value,
+                webhook_template: document.getElementById('client-webhook-template').value || null,
             };
 
             try {
@@ -202,3 +234,124 @@ window.clientsUI = {
         }
     }
 };
+
+// Helper functions for webhook configuration
+function toggleWebhookSection() {
+    const enabled = document.getElementById('webhook-enabled').checked;
+    const section = document.getElementById('webhook-section');
+    const config = document.getElementById('webhook-config');
+    const statusBadge = document.getElementById('webhook-status-badge');
+    const urlInput = document.getElementById('client-webhook-url');
+
+    if (enabled) {
+        section.classList.add('webhook-enabled');
+        section.classList.remove('webhook-disabled');
+        config.classList.remove('webhook-disabled');
+        statusBadge.classList.remove('status-disabled');
+        statusBadge.classList.add('status-enabled');
+        statusBadge.querySelector('span').textContent = i18n.t('clients.webhookEnabled') || 'Enabled';
+    } else {
+        section.classList.remove('webhook-enabled');
+        section.classList.add('webhook-disabled');
+        config.classList.add('webhook-disabled');
+        statusBadge.classList.add('status-disabled');
+        statusBadge.classList.remove('status-enabled');
+        statusBadge.querySelector('span').textContent = i18n.t('clients.webhookDisabled') || 'Disabled';
+        // Clear URL when disabling
+        urlInput.value = '';
+    }
+}
+
+function toggleWebhookTemplate() {
+    const format = document.getElementById('client-webhook-format').value;
+    const templateGroup = document.getElementById('webhook-template-group');
+    const formatInfo = document.getElementById('webhook-format-info');
+
+    if (format === 'custom') {
+        templateGroup.classList.remove('hidden');
+        templateGroup.classList.add('visible');
+        if (formatInfo) {
+            formatInfo.querySelector('span').textContent = i18n.t('clients.webhookFormatInfoCustom') || 'Custom templates let you format the webhook payload exactly as needed';
+        }
+    } else {
+        templateGroup.classList.add('hidden');
+        templateGroup.classList.remove('visible');
+        if (formatInfo) {
+            formatInfo.querySelector('span').textContent = i18n.t('clients.webhookFormatInfo') || 'Standard JSON sends structured data ideal for integrations';
+        }
+    }
+}
+
+function applyWebhookPreset() {
+    const preset = document.getElementById('webhook-template-preset').value;
+    const templateTextarea = document.getElementById('client-webhook-template');
+
+    const presets = {
+        slack: `{
+  "text": "🔔 Client *{{client_name}}* {{event}}",
+  "blocks": [
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*Client Status Update*\\n{{#if assigned_port}}Connected on port {{assigned_port}}{{else}}Disconnected after {{uptime_seconds}}s{{/if}}"
+      }
+    }
+  ]
+}`,
+        discord: `{
+  "content": "🔔 Webhook Notification",
+  "embeds": [{
+    "title": "Client {{client_name}}",
+    "description": "Status: {{event}}",
+    "color": {{#if assigned_port}}3066993{{else}}15158332{{/if}},
+    "timestamp": "{{timestamp}}",
+    "fields": [
+      {{#if assigned_port}}
+      {"name": "Port", "value": "{{assigned_port}}", "inline": true}
+      {{/if}}
+    ]
+  }]
+}`,
+        simple: `Client {{client_name}} (ID: {{client_id}}) {{event}} at {{timestamp}}{{#if assigned_port}}
+Assigned Port: {{assigned_port}}{{/if}}{{#if uptime_seconds}}
+Uptime: {{uptime_seconds}} seconds{{/if}}`
+    };
+
+    if (preset && presets[preset]) {
+        templateTextarea.value = presets[preset];
+    }
+}
+
+function showWebhookHelp() {
+    const modal = document.getElementById('webhook-help-modal');
+    if (modal) {
+        modal.classList.add('show');
+    }
+}
+
+function closeWebhookHelp() {
+    const modal = document.getElementById('webhook-help-modal');
+    if (modal) {
+        modal.classList.remove('show');
+    }
+}
+
+// Tab switching for modal
+function switchTab(event, tabId) {
+    // Remove active class from all tabs
+    document.querySelectorAll('.modal-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+
+    // Remove active class from all panels
+    document.querySelectorAll('.modal-tab-panel').forEach(panel => {
+        panel.classList.remove('active');
+    });
+
+    // Add active class to clicked tab
+    event.currentTarget.classList.add('active');
+
+    // Add active class to corresponding panel
+    document.getElementById(tabId).classList.add('active');
+}
