@@ -16,7 +16,10 @@ services:
       - DATABASE_URL=sqlite:///app/data/borui.db
       - BIND_ADDR=0.0.0.0:3000
       - RUST_LOG=info,borui=debug
-      - JWT_SECRET=${JWT_SECRET:-change-me-in-production}
+      # IMPORTANT: Generate a secure JWT_SECRET for production
+      # Example: openssl rand -hex 32
+      # Set via .env file or environment variable
+      - JWT_SECRET=${JWT_SECRET:-please-change-this-secret-in-production}
     networks:
       - borui-network
 

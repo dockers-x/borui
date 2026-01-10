@@ -14,12 +14,6 @@ RUN cargo chef prepare --recipe-path recipe.json
 # Stage 3: Build dependencies (cached layer)
 FROM chef AS builder
 
-# Install build dependencies
-RUN apt-get update && apt-get install -y \
-    pkg-config \
-    libssl-dev \
-    && rm -rf /var/lib/apt/lists/*
-
 WORKDIR /app
 
 # Build dependencies first (this layer is cached unless dependencies change)
@@ -34,10 +28,9 @@ RUN cargo build --release
 # Use bullseye (Debian 11) for better compatibility with older Linux systems
 FROM debian:bullseye-slim
 
-# Install runtime dependencies
+# Install runtime dependencies (only ca-certificates needed for HTTPS)
 RUN apt-get update && apt-get install -y \
     ca-certificates \
-    libssl3 \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -55,10 +48,11 @@ RUN mkdir -p /app/data
 EXPOSE 3000 7835-65535
 
 # Environment variables
+# IMPORTANT: Set JWT_SECRET via docker-compose.yml or -e flag for security
+# Example: docker run -e JWT_SECRET=your-secret-here ...
 ENV DATABASE_URL=sqlite:///app/data/borui.db \
     BIND_ADDR=0.0.0.0:3000 \
-    RUST_LOG=info \
-    JWT_SECRET=change-me-in-production
+    RUST_LOG=info
 
 # Run the application
 CMD ["/app/borui"]
