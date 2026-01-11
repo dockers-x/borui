@@ -25,8 +25,8 @@ COPY . .
 RUN cargo build --release
 
 # Stage 4: Runtime stage - use minimal base image
-# Use bullseye (Debian 11) for better compatibility with older Linux systems
-FROM debian:bullseye-slim
+# Use bookworm (Debian 12) to match build environment's GLIBC version
+FROM debian:bookworm-slim
 
 # Install runtime dependencies (only ca-certificates needed for HTTPS)
 RUN apt-get update && apt-get install -y \
