@@ -315,7 +315,7 @@ dependencies = [
  "handlebars",
  "jsonwebtoken",
  "mime_guess",
- "rand_core 0.6.4",
+ "rand_core 0.9.3",
  "reqwest",
  "rust-embed",
  "serde",
