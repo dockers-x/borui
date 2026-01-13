@@ -218,8 +218,76 @@ function logout() {
 
 // Global modal functions
 function closeServerModal() {
-    document.getElementById('server-modal').classList.remove('show');
+    const modal = document.getElementById('server-modal');
+    modal.classList.remove('show');
     document.getElementById('server-form').reset();
+    // Remove event listeners
+    modal.removeEventListener('click', handleModalBackdropClick);
+    document.removeEventListener('keydown', handleModalEscapeKey);
+    // Restore focus to the element that opened the modal
+    if (window.lastFocusedElement) {
+        window.lastFocusedElement.focus();
+        window.lastFocusedElement = null;
+    }
+}
+
+function openServerModal() {
+    // Store the currently focused element
+    window.lastFocusedElement = document.activeElement;
+
+    const modal = document.getElementById('server-modal');
+    modal.classList.add('show');
+
+    // Add event listeners for backdrop click and ESC key
+    setTimeout(() => {
+        modal.addEventListener('click', handleModalBackdropClick);
+        document.addEventListener('keydown', handleModalEscapeKey);
+    }, 100);
+
+    // Focus the first input field
+    const firstInput = modal.querySelector('input:not([type="checkbox"])');
+    if (firstInput) {
+        firstInput.focus();
+    }
+
+    // Trap focus within modal
+    trapFocusInModal(modal);
+}
+
+function handleModalBackdropClick(e) {
+    if (e.target.classList.contains('modal')) {
+        closeServerModal();
+    }
+}
+
+function handleModalEscapeKey(e) {
+    if (e.key === 'Escape') {
+        closeServerModal();
+    }
+}
+
+function trapFocusInModal(modal) {
+    const focusableElements = modal.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+
+    modal.addEventListener('keydown', function(e) {
+        if (e.key === 'Tab') {
+            if (e.shiftKey) {
+                if (document.activeElement === firstElement) {
+                    lastElement.focus();
+                    e.preventDefault();
+                }
+            } else {
+                if (document.activeElement === lastElement) {
+                    firstElement.focus();
+                    e.preventDefault();
+                }
+            }
+        }
+    });
 }
 
 function closeClientModal() {

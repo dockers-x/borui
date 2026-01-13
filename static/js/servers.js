@@ -102,7 +102,8 @@ window.serversUI = {
             document.getElementById('server-auto-start').checked = server.auto_start || false;
         }
 
-        modal.classList.add('show');
+        // Use the new openServerModal function
+        openServerModal();
 
         // Remove old event listener and add new one
         const newForm = form.cloneNode(true);

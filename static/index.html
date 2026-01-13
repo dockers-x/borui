@@ -164,57 +164,74 @@
     </main>
 
     <!-- Server Modal -->
-    <div id="server-modal" class="modal">
-        <div class="modal-content">
+    <div id="server-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="server-modal-title">
+        <div class="modal-content" role="document">
             <div class="modal-header">
                 <h2 id="server-modal-title" data-i18n="servers.modalTitle">Create Server</h2>
-                <span class="close" onclick="closeServerModal()">&times;</span>
+                <button type="button" class="close" onclick="closeServerModal()" aria-label="Close dialog">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
             <form id="server-form">
-                <div class="form-group">
-                    <label for="server-name"><span data-i18n="servers.name">Name</span> <span data-i18n="common.required">*</span></label>
-                    <input type="text" id="server-name" required>
-                </div>
-                <div class="form-group">
-                    <label for="server-description" data-i18n="servers.description">Description</label>
-                    <input type="text" id="server-description">
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="server-bind-addr" data-i18n="servers.bindAddr">Bind Address</label>
-                        <input type="text" id="server-bind-addr" value="0.0.0.0">
-                        <small class="form-help" data-i18n="servers.bindAddrHelp">Control server address for client connections</small>
+                <div class="modal-body">
+                    <div class="modal-form-content">
+                        <div class="form-section">
+                            <div class="form-group">
+                                <label for="server-name"><span data-i18n="servers.name">Name</span> <span data-i18n="common.required">*</span></label>
+                                <input type="text" id="server-name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="server-description" data-i18n="servers.description">Description</label>
+                                <input type="text" id="server-description">
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="server-bind-addr" data-i18n="servers.bindAddr">Bind Address</label>
+                                    <input type="text" id="server-bind-addr" value="0.0.0.0">
+                                    <small class="form-help" data-i18n="servers.bindAddrHelp">Control server address for client connections</small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="server-bind-tunnels" data-i18n="servers.bindTunnels">Bind Tunnels</label>
+                                    <input type="text" id="server-bind-tunnels" value="0.0.0.0">
+                                    <small class="form-help" data-i18n="servers.bindTunnelsHelp">Tunnel data address, defaults to bind address</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="server-port-start" data-i18n="servers.portRangeStart">Port Range Start</label>
+                                    <input type="number" id="server-port-start" value="1024" min="1024" max="65535">
+                                </div>
+                                <div class="form-group">
+                                    <label for="server-port-end" data-i18n="servers.portRangeEnd">Port Range End</label>
+                                    <input type="number" id="server-port-end" value="65535" min="1024" max="65535">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <div class="form-group">
+                                <label for="server-secret" data-i18n="servers.secret">Secret (Optional)</label>
+                                <div class="password-input-wrapper">
+                                    <input type="password" id="server-secret" class="password-input">
+                                    <button type="button" class="password-toggle" onclick="togglePasswordVisibility('server-secret')" aria-label="Toggle password visibility">
+                                        <span class="password-toggle-icon"></span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="server-auto-start">
+                                    <span data-i18n="servers.autoStart">Auto-start on application boot</span>
+                                </label>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="server-bind-tunnels" data-i18n="servers.bindTunnels">Bind Tunnels</label>
-                        <input type="text" id="server-bind-tunnels" value="0.0.0.0">
-                        <small class="form-help" data-i18n="servers.bindTunnelsHelp">Tunnel data address, defaults to bind address</small>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="server-port-start" data-i18n="servers.portRangeStart">Port Range Start</label>
-                        <input type="number" id="server-port-start" value="1024" min="1024" max="65535">
-                    </div>
-                    <div class="form-group">
-                        <label for="server-port-end" data-i18n="servers.portRangeEnd">Port Range End</label>
-                        <input type="number" id="server-port-end" value="65535" min="1024" max="65535">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="server-secret" data-i18n="servers.secret">Secret (Optional)</label>
-                    <div class="password-input-wrapper">
-                        <input type="password" id="server-secret" class="password-input">
-                        <button type="button" class="password-toggle" onclick="togglePasswordVisibility('server-secret')" aria-label="Toggle password visibility">
-                            <span class="password-toggle-icon"></span>
-                        </button>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>
-                        <input type="checkbox" id="server-auto-start">
-                        <span data-i18n="servers.autoStart">Auto-start on application boot</span>
-                    </label>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn-secondary" onclick="closeServerModal()" data-i18n="common.cancel">Cancel</button>
