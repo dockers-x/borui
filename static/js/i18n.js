@@ -12,7 +12,7 @@ class I18n {
             'clients.title': 'Bore Clients',
             'clients.create': 'Create Client',
             'system.title': 'System Information',
-            'common.loading': 'Loading...',
+            'common.loading': 'Loading…',
             'status.connected': 'Connected',
             'status.disconnected': 'Disconnected',
             'status.running': 'Running',

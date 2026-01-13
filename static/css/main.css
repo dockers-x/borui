@@ -143,7 +143,7 @@ body {
     text-decoration: none;
     padding: var(--space-xs) var(--space-md);
     border-radius: var(--radius-md);
-    transition: all var(--transition-fast);
+    transition: color var(--transition-fast), background var(--transition-fast);
     font-weight: 500;
     position: relative;
 }
@@ -193,7 +193,7 @@ body {
     cursor: pointer;
     font-size: 0.875rem;
     font-weight: 600;
-    transition: all var(--transition-fast);
+    transition: border-color var(--transition-fast), background var(--transition-fast), transform var(--transition-fast);
 }
 
 .lang-menu-button .icon {
@@ -224,7 +224,7 @@ body {
     opacity: 0;
     visibility: hidden;
     transform: translateY(-10px);
-    transition: all var(--transition-fast);
+    transition: color var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast), opacity var(--transition-fast);
     z-index: 1000;
 }
 
@@ -247,7 +247,7 @@ body {
     font-weight: 500;
     border-radius: var(--radius-sm);
     cursor: pointer;
-    transition: all var(--transition-fast);
+    transition: color var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast), opacity var(--transition-fast);
 }
 
 .lang-menu-item:hover {
@@ -309,7 +309,7 @@ body {
     cursor: pointer;
     font-size: 0.9375rem;
     font-weight: 600;
-    transition: all var(--transition-fast);
+    transition: color var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast), opacity var(--transition-fast);
     display: inline-flex;
     align-items: center;
     gap: var(--space-xs);
@@ -386,7 +386,7 @@ body {
     cursor: pointer;
     font-size: 0.875rem;
     font-weight: 600;
-    transition: all var(--transition-fast);
+    transition: color var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast), opacity var(--transition-fast);
 }
 
 .user-menu-button:hover {
@@ -412,7 +412,7 @@ body {
     opacity: 0;
     visibility: hidden;
     transform: translateY(-10px);
-    transition: all var(--transition-fast);
+    transition: color var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast), opacity var(--transition-fast);
     z-index: 1000;
 }
 
@@ -435,7 +435,7 @@ body {
     font-weight: 500;
     border-radius: var(--radius-sm);
     cursor: pointer;
-    transition: all var(--transition-fast);
+    transition: color var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast), opacity var(--transition-fast);
 }
 
 .user-menu-item:hover {
@@ -460,7 +460,7 @@ body {
     padding: var(--space-lg);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-sm);
-    transition: all var(--transition-base);
+    transition: color var(--transition-base), background var(--transition-base), border-color var(--transition-base), transform var(--transition-base), opacity var(--transition-base);
     border: 1px solid transparent;
 }
 
@@ -674,7 +674,7 @@ body {
     color: var(--text-tertiary);
     cursor: pointer;
     line-height: 1;
-    transition: all var(--transition-fast);
+    transition: color var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast), opacity var(--transition-fast);
     width: 32px;
     height: 32px;
     display: flex;
@@ -744,7 +744,7 @@ body {
     font-weight: 600;
     cursor: pointer;
     position: relative;
-    transition: all var(--transition-fast);
+    transition: color var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast), opacity var(--transition-fast);
     white-space: nowrap;
     text-align: center;
 }
@@ -826,7 +826,7 @@ body {
     background: rgba(151, 112, 201, 0.02);
     border-radius: var(--radius-md);
     border: 1px solid transparent;
-    transition: all var(--transition-fast);
+    transition: color var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast), opacity var(--transition-fast);
 }
 
 .form-section:hover {
@@ -865,7 +865,7 @@ body {
     font-size: 0.9375rem;
     color: var(--text-primary);
     background: var(--bg-secondary);
-    transition: all var(--transition-fast);
+    transition: color var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast), opacity var(--transition-fast);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
@@ -958,7 +958,7 @@ body {
     border-radius: var(--radius-md);
     margin-bottom: var(--space-md);
     overflow: hidden;
-    transition: all var(--transition-base);
+    transition: color var(--transition-base), background var(--transition-base), border-color var(--transition-base), transform var(--transition-base), opacity var(--transition-base);
 }
 
 .collapsible-header {
@@ -968,7 +968,7 @@ body {
     padding: var(--space-sm) var(--space-md);
     cursor: pointer;
     user-select: none;
-    transition: all var(--transition-fast);
+    transition: color var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast), opacity var(--transition-fast);
 }
 
 .collapsible-header:hover {
@@ -1114,7 +1114,7 @@ button .icon:last-child:first-child {
     border-left: 4px solid var(--primary);
     opacity: 0;
     transform: translateX(400px);
-    transition: all var(--transition-base);
+    transition: color var(--transition-base), background var(--transition-base), border-color var(--transition-base), transform var(--transition-base), opacity var(--transition-base);
 }
 
 .toast.show {
@@ -1224,7 +1224,7 @@ button .icon:last-child:first-child {
     width: 90%;
     opacity: 0;
     transform: scale(0.9);
-    transition: all var(--transition-base);
+    transition: color var(--transition-base), background var(--transition-base), border-color var(--transition-base), transform var(--transition-base), opacity var(--transition-base);
 }
 
 .toast-dialog.show {
@@ -1500,7 +1500,7 @@ button .icon:last-child:first-child {
     border-radius: var(--radius-md);
     padding: var(--space-md);
     margin-bottom: var(--space-md);
-    transition: all var(--transition-base);
+    transition: color var(--transition-base), background var(--transition-base), border-color var(--transition-base), transform var(--transition-base), opacity var(--transition-base);
 }
 
 .webhook-section.webhook-enabled {
@@ -1552,7 +1552,7 @@ button .icon:last-child:first-child {
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    transition: all var(--transition-base);
+    transition: color var(--transition-base), background var(--transition-base), border-color var(--transition-base), transform var(--transition-base), opacity var(--transition-base);
 }
 
 .webhook-status-indicator::before {
@@ -1611,7 +1611,7 @@ button .icon:last-child:first-child {
     background: var(--bg-tertiary);
     border: 2px solid #dfe4ea;
     border-radius: 24px;
-    transition: all var(--transition-base);
+    transition: color var(--transition-base), background var(--transition-base), border-color var(--transition-base), transform var(--transition-base), opacity var(--transition-base);
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
@@ -1624,7 +1624,7 @@ button .icon:last-child:first-child {
     bottom: 2px;
     background: white;
     border-radius: 50%;
-    transition: all var(--transition-base);
+    transition: color var(--transition-base), background var(--transition-base), border-color var(--transition-base), transform var(--transition-base), opacity var(--transition-base);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
@@ -1652,7 +1652,7 @@ button .icon:last-child:first-child {
 .webhook-config {
     display: grid;
     gap: var(--space-sm);
-    transition: all var(--transition-base);
+    transition: color var(--transition-base), background var(--transition-base), border-color var(--transition-base), transform var(--transition-base), opacity var(--transition-base);
 }
 
 .webhook-config.webhook-disabled {
@@ -1671,7 +1671,7 @@ button .icon:last-child:first-child {
     font-size: 0.9375rem;
     color: var(--text-primary);
     background: var(--bg-secondary);
-    transition: all var(--transition-fast);
+    transition: color var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast), opacity var(--transition-fast);
     font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
 }
 
@@ -1723,7 +1723,7 @@ button .icon:last-child:first-child {
     font-size: 0.875rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all var(--transition-fast);
+    transition: color var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast), opacity var(--transition-fast);
     white-space: nowrap;
     display: flex;
     align-items: center;
@@ -1751,7 +1751,7 @@ button .icon:last-child:first-child {
     cursor: pointer;
     padding: 0.25rem 0.5rem;
     border-radius: var(--radius-sm);
-    transition: all var(--transition-fast);
+    transition: color var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast), opacity var(--transition-fast);
     text-decoration: none;
     display: inline-flex;
     align-items: center;
@@ -1893,7 +1893,7 @@ button .icon:last-child:first-child {
 /* Animation for template visibility */
 #webhook-template-group {
     overflow: visible;
-    transition: all var(--transition-base);
+    transition: color var(--transition-base), background var(--transition-base), border-color var(--transition-base), transform var(--transition-base), opacity var(--transition-base);
     transform-origin: top;
 }
 

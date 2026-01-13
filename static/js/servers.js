@@ -2,7 +2,7 @@
 window.serversUI = {
     async loadServers() {
         const container = document.getElementById('servers-list');
-        container.innerHTML = '<p class="loading" data-i18n="common.loading">Loading...</p>';
+        container.innerHTML = '<p class="loading" data-i18n="common.loading">Loading…</p>';
         i18n.applyTranslations();
 
         try {
@@ -75,17 +75,12 @@ window.serversUI = {
         const modal = document.getElementById('server-modal');
         const form = document.getElementById('server-form');
         const modalTitle = document.getElementById('server-modal-title');
-        const submitBtn = form.querySelector('button[type="submit"]');
 
-        // Update modal title and button text based on mode
+        // Update modal title based on mode
         if (server) {
             modalTitle.textContent = i18n.t('servers.editTitle') || 'Edit Server';
-            submitBtn.textContent = i18n.t('common.save') || 'Save';
-            submitBtn.setAttribute('data-i18n', 'common.save');
         } else {
             modalTitle.textContent = i18n.t('servers.modalTitle') || 'Create Server';
-            submitBtn.textContent = i18n.t('common.create') || 'Create';
-            submitBtn.setAttribute('data-i18n', 'common.create');
         }
 
         form.reset();
@@ -108,6 +103,16 @@ window.serversUI = {
         // Remove old event listener and add new one
         const newForm = form.cloneNode(true);
         form.parentNode.replaceChild(newForm, form);
+
+        // Update button text AFTER cloning
+        const submitBtn = newForm.querySelector('button[type="submit"]');
+        if (server) {
+            submitBtn.textContent = i18n.t('common.save') || 'Save';
+            submitBtn.setAttribute('data-i18n', 'common.save');
+        } else {
+            submitBtn.textContent = i18n.t('common.create') || 'Create';
+            submitBtn.setAttribute('data-i18n', 'common.create');
+        }
 
         newForm.addEventListener('submit', async (e) => {
             e.preventDefault();

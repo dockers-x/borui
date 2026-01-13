@@ -138,7 +138,7 @@
 
     async function loadSystemInfo() {
         const container = document.getElementById('system-info');
-        container.innerHTML = '<p class="loading" data-i18n="common.loading">Loading...</p>';
+        container.innerHTML = '<p class="loading" data-i18n="common.loading">Loading…</p>';
         i18n.applyTranslations();
 
         try {

@@ -9,7 +9,7 @@
 <body>
     <nav class="navbar">
         <div class="nav-brand">
-            <svg class="nav-logo" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg">
+            <svg class="nav-logo" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <path d="M511.8 512m-448.2 0a448.2 448.2 0 1 0 896.4 0 448.2 448.2 0 1 0-896.4 0Z" fill="#FEBE49"></path>
                 <path d="M333.4 923.6c-28.7-12.5-89.4-42.4-146.8-103.1-25.2-26.6-43.2-52.1-55.4-71.8 6.5-28.3 12.9-56.6 19.4-85 23.7-104 34.6-151.8 54.9-213.1 6.7-20.1 10.1-30.5 15.8-43.4 28.3-64.2 67.8-102 76.1-109.7 13.6-12.7 41.6-36.6 82.1-55.3 9.9-4.6 28.4-12.4 52.6-18.8 22.9-6 41.1-8.2 48.1-8.8 30.4-2.8 60.3-1.5 89.8 4.3 6.1 1.2 17.4 3.6 31.4 7.9 11.4 3.5 36.7 12 64.4 27.8 56 32.1 88.3 75.2 97.7 88.3 20.2 28.4 30.3 52.9 40 76.3 18.5 44.9 25.8 81.1 29.1 97.1 11 53.2 28.5 126.9 57.7 236.8-7.9 12.4-19.9 29.9-36.4 49.3-84.3 99-189 132.4-215.9 140.3-24.8 7.3-70.8 18.4-129.4 17.9-82.2-0.7-144.6-23.7-175.2-37z" fill="#5D3D1E"></path>
                 <path d="M568.4 528.5c1.3-4.3 4.3-2.6 6.7-1.6 39.1 16.4 73.5 54.3 72.5 101.3-0.6 26.2-10.9 48.5-28.7 67.4-52.9 56.2-154 58.1-209.4 4-55.5-54.2-37.1-132.8 30-168 2.7-1.4 6.3-4.6 8.4 1.1 2.8 1.5 3.6 3.7 3.4 6.9-2.1 25.1 14.5 41.9 36.6 48.9 21.2 6.7 21.2 6.9 21.2 29.7v28.7c0.1-13.5 0.2-27 0-40.6-0.1-8.5 2.6-13.6 11.7-15.2 8.9-1.6 17.4-4.7 25.1-9.7 15.2-10 22.9-23.7 20.7-42.3-0.6-3.8-1.7-7.6 1.8-10.6z" fill="#9D764F"></path>
@@ -43,8 +43,8 @@
                 </div>
             </div>
             <div class="user-menu">
-                <button class="user-menu-button" id="user-menu-button">
-                    <span id="user-display-name">Loading...</span>
+                <button class="user-menu-button" id="user-menu-button" aria-label="User menu">
+                    <span id="user-display-name">Loading…</span>
                     <span class="icon" id="user-menu-icon"></span>
                 </button>
                 <div class="user-menu-dropdown" id="user-menu-dropdown">
@@ -72,7 +72,7 @@
                 </button>
             </div>
             <div id="servers-list" class="items-list">
-                <p class="loading" data-i18n="common.loading">Loading...</p>
+                <p class="loading" data-i18n="common.loading">Loading…</p>
             </div>
         </div>
 
@@ -85,7 +85,7 @@
                 </button>
             </div>
             <div id="clients-list" class="items-list">
-                <p class="loading" data-i18n="common.loading">Loading...</p>
+                <p class="loading" data-i18n="common.loading">Loading…</p>
             </div>
         </div>
 
@@ -94,7 +94,7 @@
                 <h1 data-i18n="system.title">System Information</h1>
             </div>
             <div id="system-info" class="info-panel">
-                <p class="loading" data-i18n="common.loading">Loading...</p>
+                <p class="loading" data-i18n="common.loading">Loading…</p>
             </div>
         </div>
 
@@ -111,7 +111,7 @@
                         <form id="display-name-form" class="settings-form">
                             <div class="form-group">
                                 <label for="new-display-name" data-i18n="settings.newDisplayName">New Display Name</label>
-                                <input type="text" id="new-display-name" maxlength="50">
+                                <input type="text" id="new-display-name" name="display-name" autocomplete="name" maxlength="50">
                                 <small class="form-help" data-i18n="settings.displayNameHelp">Leave empty to use username (max 50 characters)</small>
                             </div>
                             <button type="submit" class="btn-primary" data-i18n="settings.updateDisplayName">Update Display Name</button>
@@ -123,7 +123,7 @@
                         <form id="username-form" class="settings-form">
                             <div class="form-group">
                                 <label for="new-username" data-i18n="settings.newUsername">New Username</label>
-                                <input type="text" id="new-username" required minlength="3">
+                                <input type="text" id="new-username" name="username" autocomplete="username" required minlength="3">
                                 <small class="form-help" data-i18n="settings.usernameHelp">At least 3 characters, used for login</small>
                             </div>
                             <button type="submit" class="btn-primary" data-i18n="settings.updateUsername">Update Username</button>
@@ -135,16 +135,16 @@
                         <form id="password-form" class="settings-form">
                             <div class="form-group">
                                 <label for="current-password" data-i18n="settings.currentPassword">Current Password</label>
-                                <input type="password" id="current-password" required>
+                                <input type="password" id="current-password" name="current-password" autocomplete="current-password" required>
                             </div>
                             <div class="form-group">
                                 <label for="new-password" data-i18n="settings.newPassword">New Password</label>
-                                <input type="password" id="new-password" required minlength="6">
+                                <input type="password" id="new-password" name="new-password" autocomplete="new-password" required minlength="6">
                                 <small class="form-help" data-i18n="settings.passwordHelp">At least 6 characters</small>
                             </div>
                             <div class="form-group">
                                 <label for="confirm-password" data-i18n="settings.confirmPassword">Confirm New Password</label>
-                                <input type="password" id="confirm-password" required minlength="6">
+                                <input type="password" id="confirm-password" name="confirm-password" autocomplete="new-password" required minlength="6">
                             </div>
                             <button type="submit" class="btn-primary" data-i18n="settings.updatePassword">Update Password</button>
                         </form>
@@ -178,11 +178,11 @@
                         <div class="form-section">
                             <div class="form-group">
                                 <label for="server-name"><span data-i18n="servers.name">Name</span> <span data-i18n="common.required">*</span></label>
-                                <input type="text" id="server-name" required>
+                                <input type="text" id="server-name" name="server-name" autocomplete="off" required>
                             </div>
                             <div class="form-group">
                                 <label for="server-description" data-i18n="servers.description">Description</label>
-                                <input type="text" id="server-description">
+                                <input type="text" id="server-description" name="server-description" autocomplete="off">
                             </div>
                         </div>
 
@@ -190,12 +190,12 @@
                             <div class="form-row">
                                 <div class="form-group">
                                     <label for="server-bind-addr" data-i18n="servers.bindAddr">Bind Address</label>
-                                    <input type="text" id="server-bind-addr" value="0.0.0.0">
+                                    <input type="text" id="server-bind-addr" name="server-bind-addr" autocomplete="off" value="0.0.0.0">
                                     <small class="form-help" data-i18n="servers.bindAddrHelp">Control server address for client connections</small>
                                 </div>
                                 <div class="form-group">
                                     <label for="server-bind-tunnels" data-i18n="servers.bindTunnels">Bind Tunnels</label>
-                                    <input type="text" id="server-bind-tunnels" value="0.0.0.0">
+                                    <input type="text" id="server-bind-tunnels" name="server-bind-tunnels" autocomplete="off" value="0.0.0.0">
                                     <small class="form-help" data-i18n="servers.bindTunnelsHelp">Tunnel data address, defaults to bind address</small>
                                 </div>
                             </div>
@@ -205,11 +205,11 @@
                             <div class="form-row">
                                 <div class="form-group">
                                     <label for="server-port-start" data-i18n="servers.portRangeStart">Port Range Start</label>
-                                    <input type="number" id="server-port-start" value="1024" min="1024" max="65535">
+                                    <input type="number" id="server-port-start" name="server-port-start" autocomplete="off" value="1024" min="1024" max="65535">
                                 </div>
                                 <div class="form-group">
                                     <label for="server-port-end" data-i18n="servers.portRangeEnd">Port Range End</label>
-                                    <input type="number" id="server-port-end" value="65535" min="1024" max="65535">
+                                    <input type="number" id="server-port-end" name="server-port-end" autocomplete="off" value="65535" min="1024" max="65535">
                                 </div>
                             </div>
                         </div>
@@ -218,7 +218,7 @@
                             <div class="form-group">
                                 <label for="server-secret" data-i18n="servers.secret">Secret (Optional)</label>
                                 <div class="password-input-wrapper">
-                                    <input type="password" id="server-secret" class="password-input">
+                                    <input type="password" id="server-secret" name="server-secret" autocomplete="off" class="password-input">
                                     <button type="button" class="password-toggle" onclick="togglePasswordVisibility('server-secret')" aria-label="Toggle password visibility">
                                         <span class="password-toggle-icon"></span>
                                     </button>
@@ -242,11 +242,13 @@
     </div>
 
     <!-- Client Modal -->
-    <div id="client-modal" class="modal">
-        <div class="modal-content">
+    <div id="client-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="client-modal-title">
+        <div class="modal-content" role="document">
             <div class="modal-header">
                 <h2 id="client-modal-title" data-i18n="clients.modalTitle">Create Client</h2>
-                <span class="close" onclick="closeClientModal()">&times;</span>
+                <button type="button" class="close" onclick="closeClientModal()" aria-label="Close dialog">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
             <form id="client-form">
                 <div class="modal-body">
@@ -264,11 +266,11 @@
                             <div class="form-section">
                                 <div class="form-group">
                                     <label for="client-name"><span data-i18n="clients.name">Name</span> <span data-i18n="common.required">*</span></label>
-                                    <input type="text" id="client-name" required>
+                                    <input type="text" id="client-name" name="client-name" autocomplete="off" required>
                                 </div>
                                 <div class="form-group">
                                     <label for="client-description" data-i18n="clients.description">Description</label>
-                                    <input type="text" id="client-description">
+                                    <input type="text" id="client-description" name="client-description" autocomplete="off">
                                 </div>
                             </div>
 
@@ -276,21 +278,21 @@
                                 <div class="form-row">
                                     <div class="form-group">
                                         <label for="client-local-host" data-i18n="clients.localHost">Local Host</label>
-                                        <input type="text" id="client-local-host" value="localhost">
+                                        <input type="text" id="client-local-host" name="client-local-host" autocomplete="off" value="localhost">
                                     </div>
                                     <div class="form-group">
                                         <label for="client-local-port"><span data-i18n="clients.localPort">Local Port</span> <span data-i18n="common.required">*</span></label>
-                                        <input type="number" id="client-local-port" required min="1" max="65535">
+                                        <input type="number" id="client-local-port" name="client-local-port" autocomplete="off" required min="1" max="65535">
                                     </div>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group">
                                         <label for="client-remote-server"><span data-i18n="clients.remoteServer">Remote Server</span> <span data-i18n="common.required">*</span></label>
-                                        <input type="text" id="client-remote-server" required placeholder="example.com">
+                                        <input type="text" id="client-remote-server" name="client-remote-server" autocomplete="off" required placeholder="example.com">
                                     </div>
                                     <div class="form-group">
                                         <label for="client-remote-port" data-i18n="clients.remotePort">Remote Port</label>
-                                        <input type="number" id="client-remote-port" value="0" min="0" max="65535">
+                                        <input type="number" id="client-remote-port" name="client-remote-port" autocomplete="off" value="0" min="0" max="65535">
                                         <small class="form-help" data-i18n="clients.remotePortHelp">0 = auto-assign</small>
                                     </div>
                                 </div>
@@ -303,7 +305,7 @@
                                 <div class="form-group">
                                     <label for="client-secret" data-i18n="clients.secret">Secret (Optional)</label>
                                     <div class="password-input-wrapper">
-                                        <input type="password" id="client-secret" class="password-input">
+                                        <input type="password" id="client-secret" name="client-secret" autocomplete="off" class="password-input">
                                         <button type="button" class="password-toggle" onclick="togglePasswordVisibility('client-secret')" aria-label="Toggle password visibility">
                                             <span class="password-toggle-icon"></span>
                                         </button>
@@ -344,7 +346,7 @@
                                 <div class="webhook-config" id="webhook-config">
                                     <div class="form-group">
                                         <label for="client-webhook-url" data-i18n="clients.webhookUrl">Webhook URL</label>
-                                        <input type="url" id="client-webhook-url" data-i18n-placeholder="clients.webhookUrlPlaceholder" placeholder="https://your-webhook.example.com/hook">
+                                        <input type="url" id="client-webhook-url" name="client-webhook-url" autocomplete="off" data-i18n-placeholder="clients.webhookUrlPlaceholder" placeholder="https://your-webhook.example.com/hook">
                                         <span class="form-help" data-i18n="clients.webhookUrlHelp">Endpoint URL for notifications</span>
                                     </div>
 
@@ -372,7 +374,7 @@
                                             </div>
                                         </div>
                                         <label for="client-webhook-template" data-i18n="clients.webhookTemplate">Template (Handlebars)</label>
-                                        <textarea id="client-webhook-template" rows="5" data-i18n-placeholder="clients.webhookTemplatePlaceholder" placeholder="Client {{client_name}} {{event}} at {{timestamp}}"></textarea>
+                                        <textarea id="client-webhook-template" name="client-webhook-template" autocomplete="off" rows="5" data-i18n-placeholder="clients.webhookTemplatePlaceholder" placeholder="Client {{client_name}} {{event}} at {{timestamp}}"></textarea>
                                         <span class="form-help" data-i18n="clients.webhookTemplateHelp">Use Handlebars syntax</span>
                                     </div>
                                 </div>
@@ -390,11 +392,13 @@
     </div>
 
     <!-- Webhook Help Modal -->
-    <div id="webhook-help-modal" class="modal webhook-help-modal">
-        <div class="modal-content">
+    <div id="webhook-help-modal" class="modal webhook-help-modal" role="dialog" aria-modal="true" aria-labelledby="webhook-help-title">
+        <div class="modal-content" role="document">
             <div class="modal-header">
-                <h2 data-i18n="webhookHelp.title">Webhook Integration Guide</h2>
-                <span class="close" onclick="closeWebhookHelp()">&times;</span>
+                <h2 id="webhook-help-title" data-i18n="webhookHelp.title">Webhook Integration Guide</h2>
+                <button type="button" class="close" onclick="closeWebhookHelp()" aria-label="Close dialog">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
             <div class="webhook-help-content">
                 <p data-i18n="webhookHelp.intro">Webhooks allow automatic notifications when client status changes.</p>

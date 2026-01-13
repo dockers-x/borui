@@ -2,7 +2,7 @@
 window.clientsUI = {
     async loadClients() {
         const container = document.getElementById('clients-list');
-        container.innerHTML = '<p class="loading" data-i18n="common.loading">Loading...</p>';
+        container.innerHTML = '<p class="loading" data-i18n="common.loading">Loading…</p>';
         i18n.applyTranslations();
 
         try {
@@ -121,17 +121,12 @@ window.clientsUI = {
         const modal = document.getElementById('client-modal');
         const form = document.getElementById('client-form');
         const modalTitle = document.getElementById('client-modal-title');
-        const submitBtn = form.querySelector('button[type="submit"]');
 
-        // Update modal title and button text based on mode
+        // Update modal title based on mode
         if (client) {
             modalTitle.textContent = i18n.t('clients.editTitle') || 'Edit Client';
-            submitBtn.textContent = i18n.t('common.save') || 'Save';
-            submitBtn.setAttribute('data-i18n', 'common.save');
         } else {
             modalTitle.textContent = i18n.t('clients.modalTitle') || 'Create Client';
-            submitBtn.textContent = i18n.t('common.create') || 'Create';
-            submitBtn.setAttribute('data-i18n', 'common.create');
         }
 
         form.reset();
@@ -178,6 +173,16 @@ window.clientsUI = {
         // Remove old event listener and add new one
         const newForm = form.cloneNode(true);
         form.parentNode.replaceChild(newForm, form);
+
+        // Update button text AFTER cloning
+        const submitBtn = newForm.querySelector('button[type="submit"]');
+        if (client) {
+            submitBtn.textContent = i18n.t('common.save') || 'Save';
+            submitBtn.setAttribute('data-i18n', 'common.save');
+        } else {
+            submitBtn.textContent = i18n.t('common.create') || 'Create';
+            submitBtn.setAttribute('data-i18n', 'common.create');
+        }
 
         newForm.addEventListener('submit', async (e) => {
             e.preventDefault();

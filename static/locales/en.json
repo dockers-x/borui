@@ -11,7 +11,7 @@
         "username": "Username",
         "password": "Password",
         "loginButton": "Login",
-        "loggingIn": "Logging in..."
+        "loggingIn": "Logging in…"
     },
     "servers": {
         "title": "Bore Servers",
@@ -155,7 +155,7 @@
         "passwordError": "Failed to update password"
     },
     "common": {
-        "loading": "Loading...",
+        "loading": "Loading…",
         "cancel": "Cancel",
         "confirm": "Confirm",
         "create": "Create",
