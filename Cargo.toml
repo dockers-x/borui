@@ -44,7 +44,7 @@ dotenvy = "0.15"
 # Authentication
 argon2 = "0.5"
 jsonwebtoken = { version = "10.2", default-features = false, features = ["aws_lc_rs"] }
-rand_core = { version = "0.6", features = ["std"] }
+rand_core = { version = "0.9", features = ["std"] }
 
 # Concurrent data structures
 dashmap = "6.1"
