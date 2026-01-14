@@ -35,7 +35,7 @@ chrono = { version = "0.4", features = ["serde"] }
 uuid = { version = "1.2", features = ["serde", "v4"] }
 
 # Static file embedding
-rust-embed = "8.0"
+rust-embed = "8.11"
 mime_guess = "2.0"
 
 # Configuration
