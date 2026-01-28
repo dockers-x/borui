@@ -32,7 +32,7 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
 # Utilities
 chrono = { version = "0.4", features = ["serde"] }
-uuid = { version = "1.2", features = ["serde", "v4"] }
+uuid = { version = "1.20", features = ["serde", "v4"] }
 
 # Static file embedding
 rust-embed = "8.11"
