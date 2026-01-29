@@ -268,11 +268,16 @@ pub async fn create_client(pool: &SqlitePool, input: CreateClient) -> Result<Cli
 
 pub async fn update_client(pool: &SqlitePool, id: i64, input: UpdateClient) -> Result<Client> {
     // First check if client exists
-    let _ = get_client(pool, id).await?;
+    let current = get_client(pool, id).await?;
 
     // Build dynamic UPDATE query
     let mut query = String::from("UPDATE clients SET updated_at = CURRENT_TIMESTAMP");
     let mut params: Vec<String> = vec![];
+
+    // If client is in error state, reset to stopped and clear error message
+    if current.status == ClientStatus::Error {
+        query.push_str(", status = 'stopped', error_message = NULL");
+    }
 
     if let Some(name) = &input.name {
         query.push_str(", name = ?");

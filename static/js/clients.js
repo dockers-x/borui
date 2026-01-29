@@ -39,6 +39,8 @@ window.clientsUI = {
 
             const description = client.description || `<span data-i18n="common.noDescription">No description</span>`;
             const authInfo = client.secret ? `<br><strong data-i18n="clients.auth">Auth</strong>: <span data-i18n="clients.authEnabled">Enabled</span>` : '';
+            const errorInfo = client.status === 'error' && client.error_message ?
+                `<br><span class="error-message" style="color: #dc3545;">⚠ ${client.error_message}</span>` : '';
 
             return `
             <div class="item-card">
@@ -53,9 +55,10 @@ window.clientsUI = {
                     <br>
                     <strong data-i18n="clients.remote">Remote</strong>: ${client.remote_server}${remotePortDisplay}
                     ${authInfo}
+                    ${errorInfo}
                 </div>
                 <div class="item-actions">
-                    ${client.status === 'stopped' ?
+                    ${client.status === 'stopped' || client.status === 'error' ?
                         `<button class="btn-success" onclick="clientsUI.startClient(${client.id})">${getIcon('play')}<span data-i18n="clients.start">Start</span></button>` :
                         client.status === 'connected' ?
                         `<button class="btn-danger" onclick="clientsUI.stopClient(${client.id})">${getIcon('stop')}<span data-i18n="clients.stop">Stop</span></button>` :
