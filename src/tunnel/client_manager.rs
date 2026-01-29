@@ -137,6 +137,14 @@ impl ClientManager {
         }
     }
 
+    /// Get the count of connected clients
+    pub fn count_connected(&self) -> usize {
+        self.clients
+            .iter()
+            .filter(|entry| !entry.handle.is_finished())
+            .count()
+    }
+
     pub fn get_status(&self, id: i64) -> Option<ClientStatusInfo> {
         self.clients.get(&id).and_then(|entry| {
             // Check if task is still running

@@ -108,6 +108,14 @@ impl ServerManager {
         }
     }
 
+    /// Get the count of running servers
+    pub fn count_running(&self) -> usize {
+        self.servers
+            .iter()
+            .filter(|entry| !entry.handle.is_finished())
+            .count()
+    }
+
     pub fn get_status(&self, id: i64) -> Option<ServerStatusInfo> {
         self.servers.get(&id).and_then(|entry| {
             // Check if task is still running

@@ -72,9 +72,9 @@ async fn system_stats(
         .fetch_one(&state.db)
         .await?;
 
-    // Get running counts (this is a placeholder - actual implementation would query the managers)
-    let servers_running = 0;
-    let clients_connected = 0;
+    // Get running counts from managers
+    let servers_running = state.server_manager.count_running();
+    let clients_connected = state.client_manager.count_connected();
 
     Ok(Json(StatsResponse {
         servers_running,
