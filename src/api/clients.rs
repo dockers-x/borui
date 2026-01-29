@@ -56,11 +56,11 @@ async fn delete_client(
     State(state): State<AppState>,
     Path(id): Path<i64>,
 ) -> Result<StatusCode> {
-    // Ensure client is stopped before deletion
+    // Ensure client is not actively running before deletion
     let client = db::get_client(&state.db, id).await?;
-    if client.status != ClientStatus::Stopped {
+    if client.status == ClientStatus::Connected || client.status == ClientStatus::Starting {
         return Err(crate::error::AppError::BadRequest(
-            "Cannot delete running client. Stop it first.".to_string()
+            "Cannot delete active client. Stop it first.".to_string()
         ));
     }
 

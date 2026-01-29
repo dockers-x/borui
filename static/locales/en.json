@@ -65,6 +65,8 @@
         "autoAssigned": "auto-assigned",
         "secret": "Secret (Optional)",
         "autoStart": "Auto-start on application boot",
+        "enableKeepalive": "Enable TCP Keepalive",
+        "keepaliveHelp": "Keeps connection alive and detects disconnections faster",
         "tabBasic": "Basic Settings",
         "tabAdvanced": "Advanced Config",
         "tabWebhook": "Webhook",

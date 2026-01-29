@@ -61,8 +61,8 @@ window.clientsUI = {
                         `<button class="btn-danger" onclick="clientsUI.stopClient(${client.id})">${getIcon('stop')}<span data-i18n="clients.stop">Stop</span></button>` :
                         ''
                     }
-                    <button class="btn-secondary" onclick="clientsUI.showEditForm(${client.id})" ${client.status !== 'stopped' ? 'disabled' : ''}>${getIcon('edit')}<span data-i18n="common.edit">Edit</span></button>
-                    <button class="btn-danger" onclick="clientsUI.deleteClient(${client.id})" ${client.status !== 'stopped' ? 'disabled' : ''}>${getIcon('trash')}<span data-i18n="common.delete">Delete</span></button>
+                    <button class="btn-secondary" onclick="clientsUI.showEditForm(${client.id})" ${client.status === 'connected' || client.status === 'starting' ? 'disabled' : ''}>${getIcon('edit')}<span data-i18n="common.edit">Edit</span></button>
+                    <button class="btn-danger" onclick="clientsUI.deleteClient(${client.id})" ${client.status === 'connected' || client.status === 'starting' ? 'disabled' : ''}>${getIcon('trash')}<span data-i18n="common.delete">Delete</span></button>
                 </div>
             </div>
         `;
@@ -141,6 +141,7 @@ window.clientsUI = {
             document.getElementById('client-remote-port').value = client.remote_port;
             document.getElementById('client-secret').value = client.secret || '';
             document.getElementById('client-auto-start').checked = client.auto_start || false;
+            document.getElementById('client-enable-keepalive').checked = client.enable_keepalive !== false; // default true
 
             // Set webhook fields
             const webhookEnabled = !!client.webhook_url;
@@ -200,6 +201,7 @@ window.clientsUI = {
                 remote_port: parseInt(document.getElementById('client-remote-port').value),
                 secret: document.getElementById('client-secret').value || null,
                 auto_start: document.getElementById('client-auto-start').checked,
+                enable_keepalive: document.getElementById('client-enable-keepalive').checked,
                 webhook_url: webhookUrl,
                 webhook_format: document.getElementById('client-webhook-format').value,
                 webhook_template: document.getElementById('client-webhook-template').value || null,

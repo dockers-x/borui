@@ -1,7 +1,7 @@
 use crate::error::{AppError, Result};
 use crate::models::Client;
 use crate::tunnel::status::ClientStatusInfo;
-use bore_cli::client::Client as BoreClient;
+use crate::tunnel::bore_client_wrapper::BoreClientWrapper;
 use dashmap::DashMap;
 use std::sync::Arc;
 use std::time::{Duration, SystemTime};
@@ -34,6 +34,13 @@ impl ClientManager {
     pub async fn start_client(&self, client: Client) -> Result<u16> {
         tracing::info!("Starting bore client: {} (id: {})", client.name, client.id);
 
+        if client.enable_keepalive {
+            tracing::info!(
+                "Client {} has TCP keepalive enabled (time: 600s, interval: 60s)",
+                client.name
+            );
+        }
+
         // Check if already running
         if self.clients.contains_key(&client.id) {
             return Err(AppError::BadRequest(format!(
@@ -42,13 +49,14 @@ impl ClientManager {
             )));
         }
 
-        // Create bore client
-        let bore_client = BoreClient::new(
+        // Create bore client with keepalive support
+        let bore_client = BoreClientWrapper::new(
             &client.local_host,
             client.local_port as u16,
             &client.remote_server,
             client.remote_port as u16, // 0 means auto-assign
             client.secret.as_deref(),
+            client.enable_keepalive,
         )
         .await
         .map_err(|e| {

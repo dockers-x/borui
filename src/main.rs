@@ -190,14 +190,47 @@ fn start_task_monitor(state: AppState) {
                 // Remove from manager
                 state.server_manager.remove_finished_server(server_id);
 
-                // Update database status
-                if let Err(e) = db::update_server_status(
-                    &state.db,
-                    server_id,
-                    models::ServerStatus::Error,
-                    Some("Server task stopped unexpectedly".to_string())
-                ).await {
-                    tracing::error!("Failed to update server {} status in database: {}", server_id, e);
+                // Check if server has auto_start enabled
+                match db::get_server(&state.db, server_id).await {
+                    Ok(server) if server.auto_start => {
+                        tracing::info!("Server {} has auto_start enabled. Attempting to restart...", server_id);
+                        
+                        // Update status to starting
+                        if let Err(e) = db::update_server_status(
+                            &state.db,
+                            server_id,
+                            models::ServerStatus::Starting,
+                            None
+                        ).await {
+                            tracing::error!("Failed to update server {} status: {}", server_id, e);
+                            continue;
+                        }
+
+                        // Attempt to restart
+                        match state.server_manager.start_server(server.clone()).await {
+                            Ok(_) => {
+                                let _ = db::update_server_status(&state.db, server_id, models::ServerStatus::Running, None).await;
+                                let _ = db::update_server_last_started(&state.db, server_id).await;
+                                tracing::info!("Successfully restarted server {}", server_id);
+                            }
+                            Err(e) => {
+                                let error_msg = format!("Auto-restart failed: {}", e);
+                                let _ = db::update_server_status(&state.db, server_id, models::ServerStatus::Error, Some(error_msg.clone())).await;
+                                tracing::error!("Failed to restart server {}: {}", server_id, error_msg);
+                            }
+                        }
+                    }
+                    _ => {
+                        // Update database status to Error if auto_start is disabled or server not found
+                        if let Err(e) = db::update_server_status(
+                            &state.db,
+                            server_id,
+                            models::ServerStatus::Error,
+                            Some("Server task stopped unexpectedly".to_string())
+                        ).await {
+                            tracing::error!("Failed to update server {} status in database: {}", server_id, e);
+                        }
+                    }
                 }
             }
 
@@ -212,21 +245,55 @@ fn start_task_monitor(state: AppState) {
                 // Remove from manager
                 state.client_manager.remove_finished_client(client_id);
 
-                // Update database status
-                if let Err(e) = db::update_client_status(
-                    &state.db,
-                    client_id,
-                    models::ClientStatus::Error,
-                    None,
-                    Some("Client task stopped unexpectedly".to_string())
-                ).await {
-                    tracing::error!("Failed to update client {} status in database: {}", client_id, e);
+                // Check if client has auto_start enabled
+                match db::get_client(&state.db, client_id).await {
+                    Ok(client) if client.auto_start => {
+                        tracing::info!("Client {} has auto_start enabled. Attempting to reconnect...", client_id);
+                        
+                        // Update status to starting
+                        if let Err(e) = db::update_client_status(
+                            &state.db,
+                            client_id,
+                            models::ClientStatus::Starting,
+                            None,
+                            None
+                        ).await {
+                            tracing::error!("Failed to update client {} status: {}", client_id, e);
+                            continue;
+                        }
+
+                        // Attempt to reconnect
+                        match state.client_manager.start_client(client.clone()).await {
+                            Ok(assigned_port) => {
+                                let _ = db::update_client_status(&state.db, client_id, models::ClientStatus::Connected, Some(assigned_port as i64), None).await;
+                                let _ = db::update_client_last_connected(&state.db, client_id).await;
+                                tracing::info!("Successfully reconnected client {} on port {}", client_id, assigned_port);
+                            }
+                            Err(e) => {
+                                let error_msg = format!("Auto-reconnect failed: {}", e);
+                                let _ = db::update_client_status(&state.db, client_id, models::ClientStatus::Error, None, Some(error_msg.clone())).await;
+                                tracing::error!("Failed to reconnect client {}: {}", client_id, error_msg);
+                            }
+                        }
+                    }
+                    _ => {
+                        // Update database status to Error if auto_start is disabled or client not found
+                        if let Err(e) = db::update_client_status(
+                            &state.db,
+                            client_id,
+                            models::ClientStatus::Error,
+                            None,
+                            Some("Client task stopped unexpectedly".to_string())
+                        ).await {
+                            tracing::error!("Failed to update client {} status in database: {}", client_id, e);
+                        }
+                    }
                 }
             }
         }
     });
 
-    tracing::info!("Task monitor started (checking every 5 seconds)");
+    tracing::info!("Task monitor started (checking every 5 seconds, auto-restart enabled)");
 }
 
 // Synchronize database state with actual runtime state

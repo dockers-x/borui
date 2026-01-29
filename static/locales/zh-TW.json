@@ -65,6 +65,8 @@
         "autoAssigned": "已自動分配",
         "secret": "密鑰（選填）",
         "autoStart": "應用程式啟動時自動啟動",
+        "enableKeepalive": "啟用 TCP Keepalive",
+        "keepaliveHelp": "保持連線活躍並更快偵測斷線",
         "tabBasic": "基礎設定",
         "tabAdvanced": "進階設定",
         "tabWebhook": "Webhook",

@@ -1,10 +1,10 @@
 [package]
 name = "borui"
-version = "0.2.2"
+version = "0.2.3"
 edition = "2024"
 
 [dependencies]
-# Core bore functionality
+# Core bore functionality (official version - for server only)
 bore-cli = "0.6.0"
 
 # Web framework
@@ -48,6 +48,9 @@ rand_core = { version = "0.6", features = ["getrandom"] }
 
 # Concurrent data structures
 dashmap = "6.1"
+
+# TCP keepalive support
+socket2 = { version = "0.5", features = ["all"] }
 
 # HTTP client for webhooks (use rustls to avoid OpenSSL dependency in cross-compilation)
 reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
