@@ -50,7 +50,7 @@ rand_core = { version = "0.6", features = ["getrandom"] }
 dashmap = "6.1"
 
 # TCP keepalive support
-socket2 = { version = "0.5", features = ["all"] }
+socket2 = { version = "0.6", features = ["all"] }
 
 # HTTP client for webhooks (use rustls to avoid OpenSSL dependency in cross-compilation)
 reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
