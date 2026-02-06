@@ -47,7 +47,9 @@
         "updateError": "Failed to update server",
         "deleteSuccess": "Server deleted successfully",
         "deleteError": "Failed to delete server",
-        "loadError": "Failed to load server"
+        "loadError": "Failed to load server",
+        "copySuccess": "Server copied successfully",
+        "copyError": "Failed to copy server"
     },
     "clients": {
         "title": "Bore Clients",
@@ -110,7 +112,9 @@
         "updateError": "Failed to update client",
         "deleteSuccess": "Client deleted successfully",
         "deleteError": "Failed to delete client",
-        "loadError": "Failed to load client"
+        "loadError": "Failed to load client",
+        "copySuccess": "Client copied successfully",
+        "copyError": "Failed to copy client"
     },
     "system": {
         "title": "System Information",
@@ -163,10 +167,18 @@
         "create": "Create",
         "save": "Save",
         "edit": "Edit",
+        "copy": "Copy",
         "delete": "Delete",
         "logout": "Logout",
         "required": "*",
-        "noDescription": "No description"
+        "noDescription": "No description",
+        "tags": "Tags",
+        "tagsPlaceholder": "production, primary",
+        "tagsHelp": "Comma-separated tags for filtering",
+        "filterByTag": "Filter by tag:",
+        "allTags": "All",
+        "noTag": "No Tag",
+        "noMatchingItems": "No items match the selected filter."
     },
     "status": {
         "connected": "Connected",

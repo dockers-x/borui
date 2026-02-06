@@ -1,23 +1,113 @@
 // Server management UI
 window.serversUI = {
+    servers: [], // Store all servers
+    currentFilter: 'all', // Current tag filter
+
     async loadServers() {
         const container = document.getElementById('servers-list');
         container.innerHTML = '<p class="loading" data-i18n="common.loading">Loading…</p>';
         i18n.applyTranslations();
 
         try {
-            const servers = await api.listServers();
-            this.renderServers(servers);
+            this.servers = await api.listServers();
+            this.updateTagFilter();
+            this.renderServers(this.getFilteredServers());
         } catch (e) {
             container.innerHTML = `<p class="error">Failed to load servers: ${e.message}</p>`;
         }
+    },
+
+    getFilteredServers() {
+        if (this.currentFilter === 'all') {
+            return this.servers;
+        }
+        if (this.currentFilter === '__no_tag__') {
+            return this.servers.filter(s => !s.tags || s.tags.trim() === '');
+        }
+        return this.servers.filter(s => {
+            if (!s.tags) return false;
+            const tags = s.tags.split(',').map(t => t.trim().toLowerCase());
+            return tags.includes(this.currentFilter.toLowerCase());
+        });
+    },
+
+    updateTagFilter() {
+        const chipsContainer = document.getElementById('servers-tag-chips');
+        const filterBar = document.getElementById('servers-tag-filter');
+
+        // Collect all unique tags
+        const tagCounts = new Map();
+        let noTagCount = 0;
+
+        this.servers.forEach(server => {
+            if (!server.tags || server.tags.trim() === '') {
+                noTagCount++;
+            } else {
+                const tags = server.tags.split(',').map(t => t.trim());
+                tags.forEach(tag => {
+                    if (tag) {
+                        const key = tag.toLowerCase();
+                        tagCounts.set(key, (tagCounts.get(key) || 0) + 1);
+                    }
+                });
+            }
+        });
+
+        // Hide filter bar if no tags exist
+        if (tagCounts.size === 0 && noTagCount === this.servers.length) {
+            filterBar.classList.add('hidden');
+            return;
+        }
+        filterBar.classList.remove('hidden');
+
+        // Build tag chips HTML
+        let html = `
+            <button class="tag-chip ${this.currentFilter === 'all' ? 'active' : ''}" data-tag="all" onclick="serversUI.filterByTag('all')">
+                <span data-i18n="common.allTags">All</span>
+                <span class="tag-count">${this.servers.length}</span>
+            </button>
+        `;
+
+        // Add "no tag" chip if there are untagged items
+        if (noTagCount > 0) {
+            html += `
+                <button class="tag-chip no-tag ${this.currentFilter === '__no_tag__' ? 'active' : ''}" data-tag="__no_tag__" onclick="serversUI.filterByTag('__no_tag__')">
+                    <span data-i18n="common.noTag">No Tag</span>
+                    <span class="tag-count">${noTagCount}</span>
+                </button>
+            `;
+        }
+
+        // Add tag chips sorted alphabetically
+        const sortedTags = Array.from(tagCounts.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+        sortedTags.forEach(([tag, count]) => {
+            html += `
+                <button class="tag-chip ${this.currentFilter === tag ? 'active' : ''}" data-tag="${tag}" onclick="serversUI.filterByTag('${tag}')">
+                    <span>${tag}</span>
+                    <span class="tag-count">${count}</span>
+                </button>
+            `;
+        });
+
+        chipsContainer.innerHTML = html;
+        i18n.applyTranslations();
+    },
+
+    filterByTag(tag) {
+        this.currentFilter = tag;
+        this.updateTagFilter();
+        this.renderServers(this.getFilteredServers());
     },
 
     renderServers(servers) {
         const container = document.getElementById('servers-list');
 
         if (servers.length === 0) {
-            container.innerHTML = `<p class="loading" data-i18n="servers.noServers">No servers found. Create one to get started!</p>`;
+            if (this.currentFilter !== 'all') {
+                container.innerHTML = `<p class="loading" data-i18n="common.noMatchingItems">No items match the selected filter.</p>`;
+            } else {
+                container.innerHTML = `<p class="loading" data-i18n="servers.noServers">No servers found. Create one to get started!</p>`;
+            }
             i18n.applyTranslations();
             return;
         }
@@ -25,6 +115,15 @@ window.serversUI = {
         container.innerHTML = servers.map(server => {
             const description = server.description || `<span data-i18n="common.noDescription">No description</span>`;
             const authInfo = server.secret ? `<br><strong data-i18n="servers.auth">Auth</strong>: <span data-i18n="servers.authEnabled">Enabled</span>` : '';
+
+            // Render tags
+            let tagsHtml = '';
+            if (server.tags && server.tags.trim()) {
+                const tags = server.tags.split(',').map(t => t.trim()).filter(t => t);
+                if (tags.length > 0) {
+                    tagsHtml = `<div class="item-tags">${tags.map(tag => `<span class="item-tag">${tag}</span>`).join('')}</div>`;
+                }
+            }
 
             return `
             <div class="item-card">
@@ -39,16 +138,18 @@ window.serversUI = {
                     <br>
                     <strong data-i18n="servers.portRange">Port Range</strong>: ${server.port_range_start}-${server.port_range_end}
                     ${authInfo}
+                    ${tagsHtml}
                 </div>
                 <div class="item-actions">
                     ${server.status === 'stopped' ?
-                        `<button class="btn-success" onclick="serversUI.startServer(${server.id})">${getIcon('play')}<span data-i18n="servers.start">Start</span></button>` :
+                        `<button class="btn-icon btn-success" onclick="serversUI.startServer(${server.id})" data-tooltip="${i18n.t('servers.start') || 'Start'}" aria-label="${i18n.t('servers.start') || 'Start'}">${getIcon('play')}</button>` :
                         server.status === 'running' ?
-                        `<button class="btn-danger" onclick="serversUI.stopServer(${server.id})">${getIcon('stop')}<span data-i18n="servers.stop">Stop</span></button>` :
+                        `<button class="btn-icon btn-danger" onclick="serversUI.stopServer(${server.id})" data-tooltip="${i18n.t('servers.stop') || 'Stop'}" aria-label="${i18n.t('servers.stop') || 'Stop'}">${getIcon('stop')}</button>` :
                         ''
                     }
-                    <button class="btn-secondary" onclick="serversUI.showEditForm(${server.id})" ${server.status !== 'stopped' ? 'disabled' : ''}>${getIcon('edit')}<span data-i18n="common.edit">Edit</span></button>
-                    <button class="btn-danger" onclick="serversUI.deleteServer(${server.id})" ${server.status !== 'stopped' ? 'disabled' : ''}>${getIcon('trash')}<span data-i18n="common.delete">Delete</span></button>
+                    <button class="btn-icon btn-secondary" onclick="serversUI.showEditForm(${server.id})" ${server.status !== 'stopped' ? 'disabled' : ''} data-tooltip="${i18n.t('common.edit') || 'Edit'}" aria-label="${i18n.t('common.edit') || 'Edit'}">${getIcon('edit')}</button>
+                    <button class="btn-icon btn-secondary btn-copy" onclick="serversUI.copyServer(${server.id}, event)" data-tooltip="${i18n.t('common.copy') || 'Copy'}" aria-label="${i18n.t('common.copy') || 'Copy'}">${getIcon('copy')}</button>
+                    <button class="btn-icon btn-danger" onclick="serversUI.deleteServer(${server.id})" ${server.status !== 'stopped' ? 'disabled' : ''} data-tooltip="${i18n.t('common.delete') || 'Delete'}" aria-label="${i18n.t('common.delete') || 'Delete'}">${getIcon('trash')}</button>
                 </div>
             </div>
         `;
@@ -89,6 +190,7 @@ window.serversUI = {
         if (server) {
             document.getElementById('server-name').value = server.name;
             document.getElementById('server-description').value = server.description || '';
+            document.getElementById('server-tags').value = server.tags || '';
             document.getElementById('server-bind-addr').value = server.bind_addr;
             document.getElementById('server-bind-tunnels').value = server.bind_tunnels || server.bind_addr;
             document.getElementById('server-port-start').value = server.port_range_start;
@@ -120,6 +222,7 @@ window.serversUI = {
             const data = {
                 name: document.getElementById('server-name').value,
                 description: document.getElementById('server-description').value || '',
+                tags: document.getElementById('server-tags').value || null,
                 bind_addr: document.getElementById('server-bind-addr').value,
                 bind_tunnels: document.getElementById('server-bind-tunnels').value,
                 port_range_start: parseInt(document.getElementById('server-port-start').value),
@@ -192,5 +295,48 @@ window.serversUI = {
                 toast.error(i18n.t('servers.deleteError') + ': ' + e.message);
             }
         });
+    },
+
+    async copyServer(id, event) {
+        // Add visual feedback to button
+        const btn = event ? event.currentTarget : null;
+        if (btn) {
+            btn.classList.add('copy-success');
+            // Add ripple effect
+            const ripple = document.createElement('span');
+            ripple.classList.add('ripple');
+            const rect = btn.getBoundingClientRect();
+            const x = (event.clientX || rect.left + rect.width / 2) - rect.left;
+            const y = (event.clientY || rect.top + rect.height / 2) - rect.top;
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            btn.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 600);
+        }
+
+        try {
+            const server = await api.getServer(id);
+            // Create copy data with modified name
+            const copyData = {
+                name: server.name + ' (' + (i18n.t('common.copy') || 'Copy') + ')',
+                description: server.description || '',
+                tags: server.tags || null,
+                bind_addr: server.bind_addr,
+                bind_tunnels: server.bind_tunnels || server.bind_addr,
+                port_range_start: server.port_range_start,
+                port_range_end: server.port_range_end,
+                secret: server.secret || null,
+                auto_start: false, // Don't auto-start copies
+            };
+            // Create the copy directly and refresh list
+            const newServer = await api.createServer(copyData);
+            await this.loadServers();
+            toast.success(i18n.t('servers.copySuccess') || 'Server copied successfully');
+            // Open edit form for the new server so user can modify it
+            this.showEditForm(newServer.id);
+        } catch (e) {
+            if (btn) btn.classList.remove('copy-success');
+            toast.error(i18n.t('servers.copyError') + ': ' + e.message);
+        }
     }
 };

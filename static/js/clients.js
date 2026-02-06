@@ -1,23 +1,113 @@
 // Client management UI
 window.clientsUI = {
+    clients: [], // Store all clients
+    currentFilter: 'all', // Current tag filter
+
     async loadClients() {
         const container = document.getElementById('clients-list');
         container.innerHTML = '<p class="loading" data-i18n="common.loading">Loading…</p>';
         i18n.applyTranslations();
 
         try {
-            const clients = await api.listClients();
-            this.renderClients(clients);
+            this.clients = await api.listClients();
+            this.updateTagFilter();
+            this.renderClients(this.getFilteredClients());
         } catch (e) {
             container.innerHTML = `<p class="error">Failed to load clients: ${e.message}</p>`;
         }
+    },
+
+    getFilteredClients() {
+        if (this.currentFilter === 'all') {
+            return this.clients;
+        }
+        if (this.currentFilter === '__no_tag__') {
+            return this.clients.filter(c => !c.tags || c.tags.trim() === '');
+        }
+        return this.clients.filter(c => {
+            if (!c.tags) return false;
+            const tags = c.tags.split(',').map(t => t.trim().toLowerCase());
+            return tags.includes(this.currentFilter.toLowerCase());
+        });
+    },
+
+    updateTagFilter() {
+        const chipsContainer = document.getElementById('clients-tag-chips');
+        const filterBar = document.getElementById('clients-tag-filter');
+
+        // Collect all unique tags
+        const tagCounts = new Map();
+        let noTagCount = 0;
+
+        this.clients.forEach(client => {
+            if (!client.tags || client.tags.trim() === '') {
+                noTagCount++;
+            } else {
+                const tags = client.tags.split(',').map(t => t.trim());
+                tags.forEach(tag => {
+                    if (tag) {
+                        const key = tag.toLowerCase();
+                        tagCounts.set(key, (tagCounts.get(key) || 0) + 1);
+                    }
+                });
+            }
+        });
+
+        // Hide filter bar if no tags exist
+        if (tagCounts.size === 0 && noTagCount === this.clients.length) {
+            filterBar.classList.add('hidden');
+            return;
+        }
+        filterBar.classList.remove('hidden');
+
+        // Build tag chips HTML
+        let html = `
+            <button class="tag-chip ${this.currentFilter === 'all' ? 'active' : ''}" data-tag="all" onclick="clientsUI.filterByTag('all')">
+                <span data-i18n="common.allTags">All</span>
+                <span class="tag-count">${this.clients.length}</span>
+            </button>
+        `;
+
+        // Add "no tag" chip if there are untagged items
+        if (noTagCount > 0) {
+            html += `
+                <button class="tag-chip no-tag ${this.currentFilter === '__no_tag__' ? 'active' : ''}" data-tag="__no_tag__" onclick="clientsUI.filterByTag('__no_tag__')">
+                    <span data-i18n="common.noTag">No Tag</span>
+                    <span class="tag-count">${noTagCount}</span>
+                </button>
+            `;
+        }
+
+        // Add tag chips sorted alphabetically
+        const sortedTags = Array.from(tagCounts.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+        sortedTags.forEach(([tag, count]) => {
+            html += `
+                <button class="tag-chip ${this.currentFilter === tag ? 'active' : ''}" data-tag="${tag}" onclick="clientsUI.filterByTag('${tag}')">
+                    <span>${tag}</span>
+                    <span class="tag-count">${count}</span>
+                </button>
+            `;
+        });
+
+        chipsContainer.innerHTML = html;
+        i18n.applyTranslations();
+    },
+
+    filterByTag(tag) {
+        this.currentFilter = tag;
+        this.updateTagFilter();
+        this.renderClients(this.getFilteredClients());
     },
 
     renderClients(clients) {
         const container = document.getElementById('clients-list');
 
         if (clients.length === 0) {
-            container.innerHTML = `<p class="loading" data-i18n="clients.noClients">No clients found. Create one to get started!</p>`;
+            if (this.currentFilter !== 'all') {
+                container.innerHTML = `<p class="loading" data-i18n="common.noMatchingItems">No items match the selected filter.</p>`;
+            } else {
+                container.innerHTML = `<p class="loading" data-i18n="clients.noClients">No clients found. Create one to get started!</p>`;
+            }
             i18n.applyTranslations();
             return;
         }
@@ -42,6 +132,15 @@ window.clientsUI = {
             const errorInfo = client.status === 'error' && client.error_message ?
                 `<br><span class="error-message" style="color: #dc3545;">⚠ ${client.error_message}</span>` : '';
 
+            // Render tags
+            let tagsHtml = '';
+            if (client.tags && client.tags.trim()) {
+                const tags = client.tags.split(',').map(t => t.trim()).filter(t => t);
+                if (tags.length > 0) {
+                    tagsHtml = `<div class="item-tags">${tags.map(tag => `<span class="item-tag">${tag}</span>`).join('')}</div>`;
+                }
+            }
+
             return `
             <div class="item-card">
                 <div class="item-header">
@@ -56,16 +155,18 @@ window.clientsUI = {
                     <strong data-i18n="clients.remote">Remote</strong>: ${client.remote_server}${remotePortDisplay}
                     ${authInfo}
                     ${errorInfo}
+                    ${tagsHtml}
                 </div>
                 <div class="item-actions">
                     ${client.status === 'stopped' || client.status === 'error' ?
-                        `<button class="btn-success" onclick="clientsUI.startClient(${client.id})">${getIcon('play')}<span data-i18n="clients.start">Start</span></button>` :
+                        `<button class="btn-icon btn-success" onclick="clientsUI.startClient(${client.id})" data-tooltip="${i18n.t('clients.start') || 'Start'}" aria-label="${i18n.t('clients.start') || 'Start'}">${getIcon('play')}</button>` :
                         client.status === 'connected' ?
-                        `<button class="btn-danger" onclick="clientsUI.stopClient(${client.id})">${getIcon('stop')}<span data-i18n="clients.stop">Stop</span></button>` :
+                        `<button class="btn-icon btn-danger" onclick="clientsUI.stopClient(${client.id})" data-tooltip="${i18n.t('clients.stop') || 'Stop'}" aria-label="${i18n.t('clients.stop') || 'Stop'}">${getIcon('stop')}</button>` :
                         ''
                     }
-                    <button class="btn-secondary" onclick="clientsUI.showEditForm(${client.id})" ${client.status === 'connected' || client.status === 'starting' ? 'disabled' : ''}>${getIcon('edit')}<span data-i18n="common.edit">Edit</span></button>
-                    <button class="btn-danger" onclick="clientsUI.deleteClient(${client.id})" ${client.status === 'connected' || client.status === 'starting' ? 'disabled' : ''}>${getIcon('trash')}<span data-i18n="common.delete">Delete</span></button>
+                    <button class="btn-icon btn-secondary" onclick="clientsUI.showEditForm(${client.id})" ${client.status === 'connected' || client.status === 'starting' ? 'disabled' : ''} data-tooltip="${i18n.t('common.edit') || 'Edit'}" aria-label="${i18n.t('common.edit') || 'Edit'}">${getIcon('edit')}</button>
+                    <button class="btn-icon btn-secondary btn-copy" onclick="clientsUI.copyClient(${client.id}, event)" data-tooltip="${i18n.t('common.copy') || 'Copy'}" aria-label="${i18n.t('common.copy') || 'Copy'}">${getIcon('copy')}</button>
+                    <button class="btn-icon btn-danger" onclick="clientsUI.deleteClient(${client.id})" ${client.status === 'connected' || client.status === 'starting' ? 'disabled' : ''} data-tooltip="${i18n.t('common.delete') || 'Delete'}" aria-label="${i18n.t('common.delete') || 'Delete'}">${getIcon('trash')}</button>
                 </div>
             </div>
         `;
@@ -138,6 +239,7 @@ window.clientsUI = {
         if (client) {
             document.getElementById('client-name').value = client.name;
             document.getElementById('client-description').value = client.description || '';
+            document.getElementById('client-tags').value = client.tags || '';
             document.getElementById('client-local-host').value = client.local_host;
             document.getElementById('client-local-port').value = client.local_port;
             document.getElementById('client-remote-server').value = client.remote_server;
@@ -198,6 +300,7 @@ window.clientsUI = {
             const data = {
                 name: document.getElementById('client-name').value,
                 description: document.getElementById('client-description').value || '',
+                tags: document.getElementById('client-tags').value || null,
                 local_host: document.getElementById('client-local-host').value,
                 local_port: parseInt(document.getElementById('client-local-port').value),
                 remote_server: document.getElementById('client-remote-server').value,
@@ -241,6 +344,53 @@ window.clientsUI = {
             toast.success(i18n.t('clients.updateSuccess'));
         } catch (e) {
             throw e;
+        }
+    },
+
+    async copyClient(id, event) {
+        // Add visual feedback to button
+        const btn = event ? event.currentTarget : null;
+        if (btn) {
+            btn.classList.add('copy-success');
+            // Add ripple effect
+            const ripple = document.createElement('span');
+            ripple.classList.add('ripple');
+            const rect = btn.getBoundingClientRect();
+            const x = (event.clientX || rect.left + rect.width / 2) - rect.left;
+            const y = (event.clientY || rect.top + rect.height / 2) - rect.top;
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            btn.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 600);
+        }
+
+        try {
+            const client = await api.getClient(id);
+            // Create copy data with modified name
+            const copyData = {
+                name: client.name + ' (' + (i18n.t('common.copy') || 'Copy') + ')',
+                description: client.description || '',
+                tags: client.tags || null,
+                local_host: client.local_host,
+                local_port: client.local_port,
+                remote_server: client.remote_server,
+                remote_port: client.remote_port,
+                secret: client.secret || null,
+                auto_start: false, // Don't auto-start copies
+                enable_keepalive: client.enable_keepalive !== false,
+                webhook_url: client.webhook_url || null,
+                webhook_format: client.webhook_format || 'json',
+                webhook_template: client.webhook_template || null,
+            };
+            // Create the copy directly and refresh list
+            const newClient = await api.createClient(copyData);
+            await this.loadClients();
+            toast.success(i18n.t('clients.copySuccess') || 'Client copied successfully');
+            // Open edit form for the new client so user can modify it
+            this.showEditForm(newClient.id);
+        } catch (e) {
+            if (btn) btn.classList.remove('copy-success');
+            toast.error(i18n.t('clients.copyError') + ': ' + e.message);
         }
     }
 };

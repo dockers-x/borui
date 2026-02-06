@@ -18,6 +18,7 @@ pub struct Client {
     pub webhook_url: Option<String>,
     pub webhook_format: String,
     pub webhook_template: Option<String>,
+    pub tags: Option<String>,
     pub created_at: String,
     pub updated_at: String,
     pub last_connected_at: Option<String>,
@@ -53,6 +54,7 @@ pub struct CreateClient {
     #[serde(default = "default_webhook_format")]
     pub webhook_format: String,
     pub webhook_template: Option<String>,
+    pub tags: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -69,6 +71,7 @@ pub struct UpdateClient {
     pub webhook_url: Option<String>,
     pub webhook_format: Option<String>,
     pub webhook_template: Option<String>,
+    pub tags: Option<String>,
 }
 
 fn default_local_host() -> String {

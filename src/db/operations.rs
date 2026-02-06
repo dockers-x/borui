@@ -104,8 +104,8 @@ pub async fn get_server(pool: &SqlitePool, id: i64) -> Result<Server> {
 pub async fn create_server(pool: &SqlitePool, input: CreateServer) -> Result<Server> {
     let server = sqlx::query_as::<_, Server>(
         r#"
-        INSERT INTO servers (name, description, bind_addr, bind_tunnels, port_range_start, port_range_end, secret, auto_start)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO servers (name, description, bind_addr, bind_tunnels, port_range_start, port_range_end, secret, auto_start, tags)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         RETURNING *
         "#
     )
@@ -117,6 +117,7 @@ pub async fn create_server(pool: &SqlitePool, input: CreateServer) -> Result<Ser
     .bind(input.port_range_end)
     .bind(&input.secret)
     .bind(input.auto_start)
+    .bind(&input.tags)
     .fetch_one(pool)
     .await?;
 
@@ -159,6 +160,10 @@ pub async fn update_server(pool: &SqlitePool, id: i64, input: UpdateServer) -> R
     }
     if let Some(auto) = input.auto_start {
         query.push_str(&format!(", auto_start = {}", if auto { 1 } else { 0 }));
+    }
+    if let Some(tags) = &input.tags {
+        query.push_str(", tags = ?");
+        params.push(tags.clone());
     }
 
     query.push_str(" WHERE id = ?");
@@ -243,8 +248,8 @@ pub async fn get_client(pool: &SqlitePool, id: i64) -> Result<Client> {
 pub async fn create_client(pool: &SqlitePool, input: CreateClient) -> Result<Client> {
     let client = sqlx::query_as::<_, Client>(
         r#"
-        INSERT INTO clients (name, description, local_host, local_port, remote_server, remote_port, secret, auto_start, enable_keepalive, webhook_url, webhook_format, webhook_template)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO clients (name, description, local_host, local_port, remote_server, remote_port, secret, auto_start, enable_keepalive, webhook_url, webhook_format, webhook_template, tags)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         RETURNING *
         "#
     )
@@ -260,6 +265,7 @@ pub async fn create_client(pool: &SqlitePool, input: CreateClient) -> Result<Cli
     .bind(&input.webhook_url)
     .bind(&input.webhook_format)
     .bind(&input.webhook_template)
+    .bind(&input.tags)
     .fetch_one(pool)
     .await?;
 
@@ -322,6 +328,10 @@ pub async fn update_client(pool: &SqlitePool, id: i64, input: UpdateClient) -> R
     if let Some(webhook_template) = &input.webhook_template {
         query.push_str(", webhook_template = ?");
         params.push(webhook_template.clone());
+    }
+    if let Some(tags) = &input.tags {
+        query.push_str(", tags = ?");
+        params.push(tags.clone());
     }
 
     query.push_str(" WHERE id = ?");

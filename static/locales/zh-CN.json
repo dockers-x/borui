@@ -47,7 +47,9 @@
         "updateError": "服务器更新失败",
         "deleteSuccess": "服务器删除成功",
         "deleteError": "服务器删除失败",
-        "loadError": "加载服务器失败"
+        "loadError": "加载服务器失败",
+        "copySuccess": "服务器复制成功",
+        "copyError": "服务器复制失败"
     },
     "clients": {
         "title": "Bore 客户端",
@@ -110,7 +112,9 @@
         "updateError": "客户端更新失败",
         "deleteSuccess": "客户端删除成功",
         "deleteError": "客户端删除失败",
-        "loadError": "加载客户端失败"
+        "loadError": "加载客户端失败",
+        "copySuccess": "客户端复制成功",
+        "copyError": "客户端复制失败"
     },
     "system": {
         "title": "系统信息",
@@ -163,10 +167,18 @@
         "create": "创建",
         "save": "保存",
         "edit": "编辑",
+        "copy": "复制",
         "delete": "删除",
         "logout": "登出",
         "required": "*",
-        "noDescription": "无描述"
+        "noDescription": "无描述",
+        "tags": "标签",
+        "tagsPlaceholder": "生产环境, 主服务器",
+        "tagsHelp": "使用逗号分隔多个标签用于筛选",
+        "filterByTag": "按标签筛选：",
+        "allTags": "全部",
+        "noTag": "无标签",
+        "noMatchingItems": "没有符合筛选条件的项目。"
     },
     "status": {
         "connected": "已连接",

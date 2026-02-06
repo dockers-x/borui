@@ -71,6 +71,14 @@
                     <span data-i18n="servers.create">Create Server</span>
                 </button>
             </div>
+            <div class="tag-filter-bar" id="servers-tag-filter">
+                <span class="tag-filter-label" data-i18n="common.filterByTag">Filter by tag:</span>
+                <div class="tag-chips" id="servers-tag-chips">
+                    <button class="tag-chip active" data-tag="all" onclick="serversUI.filterByTag('all')">
+                        <span data-i18n="common.allTags">All</span>
+                    </button>
+                </div>
+            </div>
             <div id="servers-list" class="items-list">
                 <p class="loading" data-i18n="common.loading">Loading…</p>
             </div>
@@ -83,6 +91,14 @@
                     <span class="icon" id="create-client-icon"></span>
                     <span data-i18n="clients.create">Create Client</span>
                 </button>
+            </div>
+            <div class="tag-filter-bar" id="clients-tag-filter">
+                <span class="tag-filter-label" data-i18n="common.filterByTag">Filter by tag:</span>
+                <div class="tag-chips" id="clients-tag-chips">
+                    <button class="tag-chip active" data-tag="all" onclick="clientsUI.filterByTag('all')">
+                        <span data-i18n="common.allTags">All</span>
+                    </button>
+                </div>
             </div>
             <div id="clients-list" class="items-list">
                 <p class="loading" data-i18n="common.loading">Loading…</p>
@@ -184,6 +200,11 @@
                                 <label for="server-description" data-i18n="servers.description">Description</label>
                                 <input type="text" id="server-description" name="server-description" autocomplete="off">
                             </div>
+                            <div class="form-group">
+                                <label for="server-tags" data-i18n="common.tags">Tags</label>
+                                <input type="text" id="server-tags" name="server-tags" autocomplete="off" data-i18n-placeholder="common.tagsPlaceholder" placeholder="production, primary">
+                                <small class="form-help" data-i18n="common.tagsHelp">Comma-separated tags for filtering</small>
+                            </div>
                         </div>
 
                         <div class="form-section">
@@ -271,6 +292,11 @@
                                 <div class="form-group">
                                     <label for="client-description" data-i18n="clients.description">Description</label>
                                     <input type="text" id="client-description" name="client-description" autocomplete="off">
+                                </div>
+                                <div class="form-group">
+                                    <label for="client-tags" data-i18n="common.tags">Tags</label>
+                                    <input type="text" id="client-tags" name="client-tags" autocomplete="off" data-i18n-placeholder="common.tagsPlaceholder" placeholder="production, primary">
+                                    <small class="form-help" data-i18n="common.tagsHelp">Comma-separated tags for filtering</small>
                                 </div>
                             </div>
 

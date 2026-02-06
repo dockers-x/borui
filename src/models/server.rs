@@ -13,6 +13,7 @@ pub struct Server {
     pub secret: Option<String>,
     pub status: ServerStatus,
     pub auto_start: bool,
+    pub tags: Option<String>,
     pub created_at: String,
     pub updated_at: String,
     pub last_started_at: Option<String>,
@@ -44,6 +45,7 @@ pub struct CreateServer {
     pub secret: Option<String>,
     #[serde(default)]
     pub auto_start: bool,
+    pub tags: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -56,6 +58,7 @@ pub struct UpdateServer {
     pub port_range_end: Option<i64>,
     pub secret: Option<String>,
     pub auto_start: Option<bool>,
+    pub tags: Option<String>,
 }
 
 fn default_bind_addr() -> String {
