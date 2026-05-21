@@ -47,7 +47,7 @@ jsonwebtoken = { version = "10.3", default-features = false, features = ["aws_lc
 rand_core = { version = "0.6", features = ["getrandom"] }
 
 # Concurrent data structures
-dashmap = "6.1"
+dashmap = "6.2"
 
 # TCP keepalive support
 socket2 = { version = "0.6", features = ["all"] }
