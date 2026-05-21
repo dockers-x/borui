@@ -59,7 +59,7 @@ reqwest = { version = "0.12", default-features = false, features = ["json", "rus
 url = "2.5"
 
 # Template rendering
-handlebars = "6.2"
+handlebars = "6.4"
 
 [target.'cfg(unix)'.dependencies]
 # Graceful shutdown (Unix only)
